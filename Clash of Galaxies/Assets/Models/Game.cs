@@ -13,7 +13,7 @@ namespace Assets.Models
         private GameInfo gameInfo;
         private Dictionary<Player, Stack<Card>> decks;
         private GameBoard gameBoard;
-        private Cards cards;
+        public Cards cards; //public на время теста
 
         private Timer moveTimer;
         private int currentMoveTime;
@@ -29,17 +29,27 @@ namespace Assets.Models
             gameBoard = new GameBoard(playerA, playerB);
             cards = Cards.GetInstance(gameBoard.OpenCards);
 
+            decks = new Dictionary<Player, Stack<Card>>()
+            {
+                { playerA, new Stack<Card>() },
+                { playerB, new Stack<Card>() },
+            };
+
             PermissionMakeMove += playerA.GetPermissionToMove;
             PermissionMakeMove += playerB.GetPermissionToMove;
             DealCards += playerA.GetCardsInHand;
             DealCards += playerB.GetCardsInHand;
+
+
         }
 
         private event PermissionMakeMoveEventHandler PermissionMakeMove;
         private event DealCardsEventHandler DealCards;
 
-        private Stack<Card> GenerateDeck(Player player)
+        private void GenerateDeck(Player player)
         {
+            if (decks[player].Count > 0) return;
+
             Random r = new Random();
             Stack<Card> deckCards = new Stack<Card>();
             for (int i = 0; i < GameRules.MaxCardsInDeck; i++)
@@ -48,8 +58,7 @@ namespace Assets.Models
                 Card card = cards.Get(player, index);
                 deckCards.Push(card);
             }
-
-            return deckCards;
+            decks[player] = deckCards;
         }
 
         private void OnPermissionMakeMove(Player player, bool isPermissionMakeMove)
@@ -58,8 +67,20 @@ namespace Assets.Models
             PermissionMakeMove?.Invoke(this, args);
         }
 
-        private void OnDealCards(Player player, List<Card> cards)
+        private void OnDealCards(Player player, int countCards)
         {
+            List<Card> cards = new List<Card>();
+            for (int i = 0; i < countCards; i++)
+            {
+                try
+                {
+                    cards.Add(decks[player].Pop());
+                }
+                catch(InvalidOperationException)
+                {
+
+                }
+            }
             var args = new DealCardsEventArgs(player, cards);
             DealCards?.Invoke(this, args);
         }
@@ -97,7 +118,7 @@ namespace Assets.Models
         {
             OnPermissionMakeMove(player, true);
             playerCurrentMove = player;
-            moveTimer.Dispose();
+            moveTimer?.Dispose();
             currentMoveTime = 0;
             moveTimer = new Timer(CheckStateMoveCallback, null, 0, 1000);
         }
@@ -121,9 +142,13 @@ namespace Assets.Models
 
         public void StartRound()
         {
-            decks[playerA] = GenerateDeck(playerA);
-            decks[playerB] = GenerateDeck(playerB);
-            AllowMove(playerA);
+            GenerateDeck(playerA);
+            GenerateDeck(playerB);
+
+            OnDealCards(playerA, GameRules.MaxStartPlayerCards);
+            OnDealCards(playerB, GameRules.MaxStartPlayerCards);
+
+            //AllowMove(playerA);
         }
     }
 }

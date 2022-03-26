@@ -34,6 +34,7 @@ namespace Assets.Models
                     new Card("Star", 10, "Статичная карта звезды."),
 
                 };
+                Count = cards.Count;
                 valuesCards.Add(player, cards);
             }
         }
@@ -46,13 +47,7 @@ namespace Assets.Models
             return instance;
         }
 
-        public int Count
-        {
-            get
-            {
-                return valuesCards.Count;
-            }
-        }
+        public int Count { get; private set; }
 
         public Card Get(Player owner, int index)
         {

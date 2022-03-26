@@ -14,6 +14,7 @@ namespace Assets.Models
         public Player(string name)
         {
             Name = name;
+            cardsInHand = new List<Card>();
         }
 
         public event MakeMoveEventHandler MakeMove;
