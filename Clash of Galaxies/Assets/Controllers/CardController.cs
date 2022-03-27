@@ -18,5 +18,21 @@ namespace Assets.Controllers
             this.cardView = cardView;
             cardView.SetCardInfo(card.Name, card.GamePoints, card.InfluenceGamePoints);
         }
+
+        public CardView CardView 
+        {
+            get 
+            {
+                return cardView;
+            }
+        }
+
+        public Card Card 
+        {
+            get 
+            {
+                return card;
+            }
+        }
     }
 }

@@ -10,6 +10,7 @@ public class GameController : MonoBehaviour
     private Player playerA, playerB;
 
     private PlayerController playerControllerA, playerControllerB;
+    private GameBoardController gameBoardController;
     
     // All controllers next level:
     // - Game board controller
@@ -27,7 +28,11 @@ public class GameController : MonoBehaviour
     void Start()
     {
         game.StartRound();
-        playerControllerA = new PlayerController(playerA, FindObjectOfType<PlayerView>());
+        PlayerView playerView = GameObject.Find("PlayerUserUI").GetComponent<PlayerView>();
+        playerControllerA = new PlayerController(playerA, playerView);
+
+        GameBoardView gameBoardView = FindObjectOfType<GameBoardView>();
+        gameBoardController = new GameBoardController(game.GameBoard, gameBoardView, playerControllerA);
     }
 
     // Update is called once per frame

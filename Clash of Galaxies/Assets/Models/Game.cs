@@ -43,6 +43,14 @@ namespace Assets.Models
 
         }
 
+        public GameBoard GameBoard 
+        {
+            get 
+            {
+                return gameBoard;
+            }
+        }
+
         private event PermissionMakeMoveEventHandler PermissionMakeMove;
         private event DealCardsEventHandler DealCards;
 
@@ -147,6 +155,8 @@ namespace Assets.Models
 
             OnDealCards(playerA, GameRules.MaxStartPlayerCards);
             OnDealCards(playerB, GameRules.MaxStartPlayerCards);
+
+            OnPermissionMakeMove(playerA, true);
 
             //AllowMove(playerA);
         }

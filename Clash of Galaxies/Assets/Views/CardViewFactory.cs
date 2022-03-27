@@ -11,11 +11,15 @@ namespace Assets.Views
 	{
 		private static CardViewFactory instance;
 		private GameObject cardPref;
+		private GameObject tempCard;
 
 		// Create the view
 		private CardViewFactory()
 		{
 			cardPref = Resources.Load<GameObject>("Prefabs/CardPref");
+			var instance = Resources.Load<GameObject>("Prefabs/TempCardPref");
+			tempCard = UnityEngine.Object.Instantiate(instance);
+			tempCard.SetActive(true);
 		}
 
 		public static CardViewFactory GetInstance() 
@@ -30,6 +34,11 @@ namespace Assets.Views
 		{
 			var instance = UnityEngine.Object.Instantiate(cardPref);
 			return instance.GetComponent<CardView>();
+		}
+
+		public GameObject GetTempCard() 
+		{
+			return tempCard;
 		}
 	}
 }

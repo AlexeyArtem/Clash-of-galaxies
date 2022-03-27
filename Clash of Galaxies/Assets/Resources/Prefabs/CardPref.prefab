@@ -489,6 +489,7 @@ GameObject:
   - component: {fileID: 2026076146947126851}
   - component: {fileID: 7988001893559731523}
   - component: {fileID: 2231347970702014268}
+  - component: {fileID: 6977424325733758478}
   m_Layer: 5
   m_Name: CardPref
   m_TagString: Untagged
@@ -574,7 +575,18 @@ MonoBehaviour:
   Name: {fileID: 186183594256118192}
   GamePoints: {fileID: 2610596356249394051}
   InfluenceGamePoints: {fileID: 8990738684206219974}
-  CardPref: {fileID: 7294892529454891117}
+--- !u!225 &6977424325733758478
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7294892529454891117}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 1
 --- !u!1 &8804799938387217452
 GameObject:
   m_ObjectHideFlags: 0

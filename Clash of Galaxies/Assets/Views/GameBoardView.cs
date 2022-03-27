@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class GameBoardView : MonoBehaviour
 {
@@ -14,5 +15,11 @@ public class GameBoardView : MonoBehaviour
     void Update()
     {
         
+    }
+
+    public void SetCardView(CardView cardView) 
+    {
+        var temp = cardView;
+        cardView.DefaultParent = transform;
     }
 }

@@ -3,19 +3,30 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
+using Assets.Views;
 
 public class CardView : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     private Camera mainCamera;
     private Vector2 offset;
+    //private Transform DefaultParent;
+    //private Transform DefaultTempCardParent;
+
+    private GameObject tempCard; // Временный шаблон карты, который отображает позицию для вставки карты
 
     public Image Logo;
     public TextMeshProUGUI Name, GamePoints, InfluenceGamePoints;
 
+    public Transform DefaultTempCardParent { get; set; }
+    public Transform DefaultParent { get; set; }
+
     void Awake() 
     {
-        //Получение объекта камеры сцены
+        // Получение объекта камеры сцены
         mainCamera = Camera.allCameras[0];
+
+        // 
+        tempCard = CardViewFactory.GetInstance().GetTempCard();
     }
     
     // Start is called before the first frame update
@@ -30,6 +41,25 @@ public class CardView : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
 
     }
 
+    // Проверка позиции текущей карты относительно других и перемещение карты в зависимости от позиции карт, находящихся рядом
+    private void RecalculatePosition()
+    {
+        int newIndex = DefaultTempCardParent.childCount;
+        for (int i = 0; i < DefaultTempCardParent.childCount; i++)
+        {
+            if (transform.position.x < DefaultTempCardParent.GetChild(i).position.x)
+            {
+                newIndex = i;
+
+                if (tempCard.transform.GetSiblingIndex() < newIndex)
+                    newIndex--;
+
+                break;
+            }
+        }
+        tempCard.transform.SetSiblingIndex(newIndex);
+    }
+
     public void SetCardInfo(string name, int gamePoints, int influenceGamePoints)
     {
         Name.text = name;
@@ -39,37 +69,56 @@ public class CardView : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        tempCard.SetActive(true);
+
         offset = transform.position - mainCamera.ScreenToWorldPoint(eventData.position);
 
-        ////Перемещение элемента вверх по иерархии игровых объектов
-        //DefaultParent = DefaultTempCardParent = transform.parent;
+        // Перемещение элемента вверх по иерархии игровых объектов
+        DefaultParent = DefaultTempCardParent = transform.parent;
 
-        ////Начинать перетаскивание можно, только если карта находится в поле руки игрока или в поле выбораса карты и если сейчас ход игрока
+        // Начинать перетаскивание можно, только если карта находится в поле руки игрока или в поле выброса карты и если сейчас ход игрока
         //isDraggable = (DefaultParent.GetComponent<DropPlaceScr>().FieldType == FieldType.SelfHand ||
         //               DefaultParent.GetComponent<DropPlaceScr>().FieldType == FieldType.SelfField)
         //              && GameManagerScr.IsPlayerTurn;
         //if (!isDraggable) return;
 
-        //tempCard.transform.SetParent(DefaultParent); //В качестве родителя для временной карты выступает родитель текущей карта, т.е. Hand
-        //tempCard.transform.SetSiblingIndex(transform.GetSiblingIndex());
+        tempCard.transform.SetParent(DefaultParent, false); //В качестве родителя для временной карты выступает родитель текущей карта, т.е. Hand
+        tempCard.transform.SetSiblingIndex(transform.GetSiblingIndex());
 
-        //transform.SetParent(DefaultParent.parent); //Установка для карты родителя её родителя, то есть BG (background)
+        transform.SetParent(DefaultParent.parent); //Установка для карты родителя её родителя, то есть BG (background)
 
-        //GetComponent<CanvasGroup>().blocksRaycasts = false;
+        GetComponent<CanvasGroup>().blocksRaycasts = false;
 
-        ////Подсвечивание карт противника для атаки, когда мы берем её в руку
+        // Подсвечивание карт противника для атаки, когда мы берем её в руку
         //if (GetComponent<CardInfoScr>().SelfCard.CanAttack)
-        //    GameManagerScr.HighlightTargets(true);
+            //GameManagerScr.HighlightTargets(true);
     }
 
     public void OnDrag(PointerEventData eventData)
     {
+        // Получение текущих координат экрана и преобразование к глобальным коодинатам
         Vector2 newPos = mainCamera.ScreenToWorldPoint(eventData.position);
         transform.position = newPos + offset;
+
+        if (tempCard.transform.parent != DefaultTempCardParent)
+            tempCard.transform.SetParent(DefaultTempCardParent);
+
+        RecalculatePosition();
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        //if (!isDraggable) return;
 
+        if (DefaultParent != null)
+            transform.SetParent(DefaultParent);
+
+        GetComponent<CanvasGroup>().blocksRaycasts = true;
+
+        // Установка индекса временной карты текущей карте
+        transform.SetSiblingIndex(tempCard.transform.GetSiblingIndex());
+
+        // Убрать временную карту с игрового поля, когда перетаскивание завершено
+        tempCard.SetActive(false);
     }
 }

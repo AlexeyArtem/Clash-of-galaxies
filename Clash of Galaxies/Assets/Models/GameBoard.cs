@@ -22,6 +22,9 @@ namespace Assets.Models
             playerB.MakeMove += ToProcessMove;
         }
 
+        // Заглушка для теста
+        public event MakeMoveEventHandler NewOpenCard;
+
         public IReadOnlyDictionary<Player, List<Card>> OpenCards
         {
             get
@@ -37,6 +40,7 @@ namespace Assets.Models
                 Card card = args.Card;
                 openCards[player].Add(card);
                 card.Destroy += ToProcessDestructionCard;
+                NewOpenCard?.Invoke(this, new MakeMoveEventArgs(card));
             }
         }
 

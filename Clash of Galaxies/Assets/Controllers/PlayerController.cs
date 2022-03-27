@@ -13,22 +13,41 @@ namespace Assets.Controllers
     {
         private Player player;
         private PlayerView playerView;
+        private List<CardController> cardControllers;
+
+        public IReadOnlyCollection<CardController> CardControllers 
+        {
+            get 
+            {
+                return cardControllers;
+            }
+        }
 
         public PlayerController(Player player, PlayerView playerView)
         {
             this.player = player;
             this.playerView = playerView;
+            cardControllers = new List<CardController>();
 
             List<CardView> cardViews = new List<CardView>(); 
             foreach (var card in player.CardsInHand)
             {
                 CardView cardView = CardViewFactory.GetInstance().GetView();
                 cardViews.Add(cardView);
-                new CardController(card, cardView);
+                cardControllers.Add(new CardController(card, cardView));
             }
             playerView.SetCardViews(cardViews);
+            playerView.DropCard = DropCardView;
         }
 
-
+        public void DropCardView(CardView cardView)
+        {
+            CardController cardController = cardControllers.Where(c => c.CardView == cardView).First();
+            if (cardController != null) 
+            {
+                Card card = cardController.Card;
+                player.OnMakeMove(card);
+            }
+        }
     }
 }
