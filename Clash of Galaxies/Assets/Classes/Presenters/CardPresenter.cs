@@ -4,22 +4,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Assets.Models;
+using Assets.Views;
 
-namespace Assets.Controllers
+namespace Assets.Presenters
 {
-    class CardController
+    class CardPresenter
     {
         private Card card;
-        private CardView cardView;
+        private ICardView cardView;
 
-        public CardController(Card card, CardView cardView)
+        public CardPresenter(Card card, ICardView cardView)
         {
             this.card = card;
             this.cardView = cardView;
-            cardView.SetCardInfo(card.Name, card.GamePoints, card.InfluenceGamePoints);
+            cardView.SetCardInfo(card.Name, card.Description, card.GamePoints, card.InfluenceGamePoints);
         }
 
-        public CardView CardView 
+        public ICardView CardView 
         {
             get 
             {

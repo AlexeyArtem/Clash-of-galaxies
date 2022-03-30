@@ -9,6 +9,8 @@ namespace Assets.Models
 {
     public class Game
     {
+        private static Random rand = new Random();
+
         private Player playerA, playerB;
         private GameInfo gameInfo;
         private Dictionary<Player, Stack<Card>> decks;
@@ -39,8 +41,6 @@ namespace Assets.Models
             PermissionMakeMove += playerB.GetPermissionToMove;
             DealCards += playerA.GetCardsInHand;
             DealCards += playerB.GetCardsInHand;
-
-
         }
 
         public GameBoard GameBoard 
@@ -58,11 +58,10 @@ namespace Assets.Models
         {
             if (decks[player].Count > 0) return;
 
-            Random r = new Random();
             Stack<Card> deckCards = new Stack<Card>();
             for (int i = 0; i < GameRules.MaxCardsInDeck; i++)
             {
-                int index = r.Next(0, cards.Count);
+                int index = rand.Next(0, cards.Count);
                 Card card = cards.Get(player, index);
                 deckCards.Push(card);
             }

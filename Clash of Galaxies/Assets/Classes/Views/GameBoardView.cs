@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using Assets.Views;
 
-public class GameBoardView : MonoBehaviour
+public class GameBoardView : MonoBehaviour, IGameBoardView
 {
     // Start is called before the first frame update
     void Start()
@@ -17,9 +18,9 @@ public class GameBoardView : MonoBehaviour
         
     }
 
-    public void SetCardView(CardView cardView) 
+    public void SetCardView(ICardView cardView) 
     {
-        var temp = cardView;
-        cardView.DefaultParent = transform;
+        var objectCardView = cardView as CardView;
+        objectCardView.DefaultParent = transform;
     }
 }

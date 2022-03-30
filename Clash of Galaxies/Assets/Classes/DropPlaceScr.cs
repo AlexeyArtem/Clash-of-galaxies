@@ -47,6 +47,6 @@ public class DropPlaceScr : MonoBehaviour, IDropHandler, IPointerEnterHandler, I
 
         CardView cardView = eventData.pointerDrag.GetComponent<CardView>();
 
-        playerView.DropCard.Invoke(cardView); // Вызов события хода выбранной карты, на которое подписан контроллер
+        playerView.DropCardCallback.Invoke(cardView); // Вызов события хода выбранной карты, на которое подписан контроллер
     }
 }

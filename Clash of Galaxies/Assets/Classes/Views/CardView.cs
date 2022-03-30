@@ -5,15 +5,11 @@ using TMPro;
 using UnityEngine.EventSystems;
 using Assets.Views;
 
-public class CardView : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
     private Camera mainCamera;
     private Vector2 offset;
-    //private Transform DefaultParent;
-    //private Transform DefaultTempCardParent;
-
     private GameObject tempCard; // Временный шаблон карты, который отображает позицию для вставки карты
-
     public Image Logo;
     public TextMeshProUGUI Name, GamePoints, InfluenceGamePoints;
 
@@ -24,8 +20,6 @@ public class CardView : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
     {
         // Получение объекта камеры сцены
         mainCamera = Camera.allCameras[0];
-
-        // 
         tempCard = CardViewFactory.GetInstance().GetTempCard();
     }
     
@@ -60,7 +54,7 @@ public class CardView : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         tempCard.transform.SetSiblingIndex(newIndex);
     }
 
-    public void SetCardInfo(string name, int gamePoints, int influenceGamePoints)
+    public void SetCardInfo(string name, string description, int gamePoints, int influenceGamePoints)
     {
         Name.text = name;
         GamePoints.text = gamePoints.ToString();
@@ -69,6 +63,8 @@ public class CardView : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
 
     public void OnBeginDrag(PointerEventData eventData)
     {
+        if (transform.parent.name == "EnemyHand") return; // Нельзя перетаскивать карту, которая находится у противника
+
         tempCard.SetActive(true);
 
         offset = transform.position - mainCamera.ScreenToWorldPoint(eventData.position);
@@ -76,26 +72,18 @@ public class CardView : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         // Перемещение элемента вверх по иерархии игровых объектов
         DefaultParent = DefaultTempCardParent = transform.parent;
 
-        // Начинать перетаскивание можно, только если карта находится в поле руки игрока или в поле выброса карты и если сейчас ход игрока
-        //isDraggable = (DefaultParent.GetComponent<DropPlaceScr>().FieldType == FieldType.SelfHand ||
-        //               DefaultParent.GetComponent<DropPlaceScr>().FieldType == FieldType.SelfField)
-        //              && GameManagerScr.IsPlayerTurn;
-        //if (!isDraggable) return;
-
         tempCard.transform.SetParent(DefaultParent, false); //В качестве родителя для временной карты выступает родитель текущей карта, т.е. Hand
         tempCard.transform.SetSiblingIndex(transform.GetSiblingIndex());
 
         transform.SetParent(DefaultParent.parent); //Установка для карты родителя её родителя, то есть BG (background)
 
         GetComponent<CanvasGroup>().blocksRaycasts = false;
-
-        // Подсвечивание карт противника для атаки, когда мы берем её в руку
-        //if (GetComponent<CardInfoScr>().SelfCard.CanAttack)
-            //GameManagerScr.HighlightTargets(true);
     }
 
     public void OnDrag(PointerEventData eventData)
     {
+        if (transform.parent.name == "EnemyHand") return;
+
         // Получение текущих координат экрана и преобразование к глобальным коодинатам
         Vector2 newPos = mainCamera.ScreenToWorldPoint(eventData.position);
         transform.position = newPos + offset;
@@ -108,7 +96,7 @@ public class CardView : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        //if (!isDraggable) return;
+        if (transform.parent.name == "EnemyHand") return;
 
         if (DefaultParent != null)
             transform.SetParent(DefaultParent);
