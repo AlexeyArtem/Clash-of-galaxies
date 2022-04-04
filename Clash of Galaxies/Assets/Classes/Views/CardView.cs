@@ -5,14 +5,14 @@ using TMPro;
 using UnityEngine.EventSystems;
 using Assets.Views;
 
-public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandler, IEndDragHandler
+public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerClickHandler
 {
     private Camera mainCamera;
     private Vector2 offset;
     private GameObject tempCard; // ¬ременный шаблон карты, который отображает позицию дл€ вставки карты
     public Image Logo;
     public TextMeshProUGUI Name, GamePoints, InfluenceGamePoints;
-
+    public GameObject Shirt;
     public Transform DefaultTempCardParent { get; set; }
     public Transform DefaultParent { get; set; }
 
@@ -63,7 +63,7 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        if (transform.parent.name == "EnemyHand") return; // Ќельз€ перетаскивать карту, котора€ находитс€ у противника
+        if (transform.parent.name == "EnemyHand" || transform.parent.name == "EnemyField") return; // Ќельз€ перетаскивать карту, котора€ находитс€ у противника
 
         tempCard.SetActive(true);
 
@@ -75,14 +75,14 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
         tempCard.transform.SetParent(DefaultParent, false); //¬ качестве родител€ дл€ временной карты выступает родитель текущей карта, т.е. Hand
         tempCard.transform.SetSiblingIndex(transform.GetSiblingIndex());
 
-        transform.SetParent(DefaultParent.parent); //”становка дл€ карты родител€ еЄ родител€, то есть BG (background)
+        transform.SetParent(DefaultParent.parent.parent); //”становка дл€ карты родител€ в качестве BG (background)
 
         GetComponent<CanvasGroup>().blocksRaycasts = false;
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        if (transform.parent.name == "EnemyHand") return;
+        if (transform.parent.name == "EnemyHand" || transform.parent.name == "EnemyField") return;
 
         // ѕолучение текущих координат экрана и преобразование к глобальным коодинатам
         Vector2 newPos = mainCamera.ScreenToWorldPoint(eventData.position);
@@ -96,7 +96,7 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        if (transform.parent.name == "EnemyHand") return;
+        if (transform.parent.name == "EnemyHand" || transform.parent.name == "EnemyField") return;
 
         if (DefaultParent != null)
             transform.SetParent(DefaultParent);
@@ -108,5 +108,29 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
 
         // ”брать временную карту с игрового пол€, когда перетаскивание завершено
         tempCard.SetActive(false);
+    }
+
+    public void SetActiveCardShirt(bool isActive)
+    {
+        Shirt.SetActive(isActive);
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (transform.parent.name == "SelfField" || transform.parent.name == "EnemyField") 
+        {
+            PlayerView playerView = FindObjectOfType<PlayerView>();
+            playerView?.PlayCurrentCardCallback?.Invoke(this);
+        }
+    }
+
+    public void ChangeGamePoints(int gamePoints)
+    {
+        GamePoints.text = gamePoints.ToString();
+    }
+
+    public void DestroyView() 
+    {
+        Destroy(gameObject);
     }
 }

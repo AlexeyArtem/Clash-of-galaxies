@@ -17,10 +17,13 @@ namespace Assets.Models
 
         protected override void ProcessPlayedCard(object sender, MakeMoveEventArgs args)
         {
-            base.ProcessPlayedCard(sender, args);
+            //base.ProcessPlayedCard(sender, args);
+            if (!CheckEventArgs(args)) return;
+
+            Card targetCard = args.TargetCard;
             var targetCards = openCards.Where(p => p.Key != owner).FirstOrDefault().Value;
-            if (!targetCards.Contains(args.Card)) return;
-            Card targetCard = args.Card;
+            if (!targetCards.Contains(targetCard)) return;
+            
             InfluencingGamePoints = 0 - targetCard.GamePoints;
             currentCard.InfluenceOnCard(targetCard);
 

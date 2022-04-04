@@ -110,7 +110,7 @@ namespace Assets.Models
                     OnPermissionMakeMove(playerA, false);
                     AllowMove(playerB);
                 }
-                else if (playerCurrentMove == playerB)
+                else
                 {
                     OnPermissionMakeMove(playerB, false);
                     AllowMove(playerA);
@@ -155,7 +155,9 @@ namespace Assets.Models
             OnDealCards(playerA, GameRules.MaxStartPlayerCards);
             OnDealCards(playerB, GameRules.MaxStartPlayerCards);
 
+            // На время тестирования
             OnPermissionMakeMove(playerA, true);
+            OnPermissionMakeMove(playerB, true);
 
             //AllowMove(playerA);
         }

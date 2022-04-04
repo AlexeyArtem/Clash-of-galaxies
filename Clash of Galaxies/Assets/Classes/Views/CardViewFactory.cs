@@ -13,7 +13,6 @@ namespace Assets.Views
 		private GameObject cardPref;
 		private GameObject tempCard;
 
-		// Create the view
 		private CardViewFactory()
 		{
 			cardPref = Resources.Load<GameObject>("Prefabs/CardPref");

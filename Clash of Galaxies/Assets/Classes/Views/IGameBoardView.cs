@@ -8,6 +8,8 @@ namespace Assets.Views
 {
     interface IGameBoardView
     {
+        void SetCardViewPlayerA(ICardView cardView);
+        void SetCardViewPlayerB(ICardView cardView);
         void SetCardView(ICardView cardView);
     }
 }

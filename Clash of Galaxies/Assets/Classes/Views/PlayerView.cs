@@ -8,7 +8,8 @@ using System;
 
 public class PlayerView : MonoBehaviour, IPlayerView
 {
-    public Action<ICardView> DropCardCallback { get; set; } // —сылка на метод презентера
+    public Action<ICardView> DropCardCallback { get; set; } // —сылка на метод презентера, который вызывает метод выполнени€ хода в модели
+    public Action<ICardView> PlayCurrentCardCallback { get; set; } // —сылка на метод презентера, который вызывает метод взаимодействи€ с выбранной картой
 
     // Start is called before the first frame update
     void Start()

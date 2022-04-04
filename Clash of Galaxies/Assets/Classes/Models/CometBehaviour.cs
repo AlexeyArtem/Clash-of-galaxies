@@ -17,9 +17,12 @@ namespace Assets.Models
 
         protected override void ProcessPlayedCard(object sender, MakeMoveEventArgs args)
         {
-            base.ProcessPlayedCard(sender, args);
+            if (!CheckEventArgs(args)) return;
 
-            Card targetCard = args.Card;
+            Card targetCard = args.TargetCard;
+            var targetCards = openCards.Where(p => p.Key == owner).FirstOrDefault().Value;
+            if (!targetCards.Contains(targetCard)) return;
+
             if (targetCard.Name == "Star") // В два раза сильнее усилить, если выбрана карта Звезды
             {
                 int influencingGamePoints = InfluencingGamePoints;

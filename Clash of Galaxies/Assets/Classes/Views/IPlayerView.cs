@@ -8,7 +8,8 @@ namespace Assets.Views
 {
     interface IPlayerView
     {
-        public Action<ICardView> DropCardCallback { get; set; }
-        public void SetCardViews(ICollection<ICardView> cardViews);
+        Action<ICardView> PlayCurrentCardCallback { get; set; }
+        Action<ICardView> DropCardCallback { get; set; }
+        void SetCardViews(ICollection<ICardView> cardViews);
     }
 }

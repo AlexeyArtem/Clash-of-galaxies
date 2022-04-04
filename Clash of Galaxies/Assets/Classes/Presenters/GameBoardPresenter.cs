@@ -22,12 +22,28 @@ namespace Assets.Presenters
             gameBoard.NewOpenCard += GameBoard_NewOpenCard;
         }
 
+        public GameBoardPresenter(GameBoard gameBoard, IGameBoardView gameBoardView)
+        {
+            this.gameBoard = gameBoard;
+            this.gameBoardView = gameBoardView;
+            gameBoard.NewOpenCard += GameBoard_NewOpenCard;
+        }
+
         private void GameBoard_NewOpenCard(object sender, MakeMoveEventArgs args)
         {
-            CardPresenter cardPresenter = cardPresenters.Where(c => c.Card == args.Card)?.FirstOrDefault();
+            //CardPresenter cardPresenter = cardPresenters.Where(c => c.Card == args.Card)?.FirstOrDefault();
+            //if (cardPresenter != null) 
+            //{
+            //    gameBoardView.SetCardView(cardPresenter.CardView);
+            //}
+            CardPresenter cardPresenter = CardPresenterFactory.GetInstance().FindPresenter(args.Card);
             if (cardPresenter != null)
             {
-                gameBoardView.SetCardView(cardPresenter.CardView);
+                if (args.Player == gameBoard.PlayerA)
+                    gameBoardView.SetCardViewPlayerA(cardPresenter.CardView);
+
+                else if (args.Player == gameBoard.PlayerB)
+                    gameBoardView.SetCardViewPlayerB(cardPresenter.CardView);
             }
         }
     }

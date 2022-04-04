@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,12 +10,15 @@ namespace Assets.Models
     public class Player
     {
         protected List<Card> cardsInHand;
-        //protected Card CurrentCard;
+        protected List<Card> openCards;
 
         public Player(string name)
         {
             Name = name;
             cardsInHand = new List<Card>();
+            openCards = new List<Card>();
+            CardsInHand = new ReadOnlyCollection<Card>(cardsInHand);
+            //OpenCards = new ReadOnlyCollection<Card>(openCards);
         }
 
         public event MakeMoveEventHandler MakeMove;
@@ -24,11 +28,23 @@ namespace Assets.Models
         public Card CurrentCard { get; protected set; }
         public bool IsMoveCompleted { get; protected set; } = true;
         public bool IsPermissionMakeMove { get; protected set; } = false;
-        public IReadOnlyCollection<Card> CardsInHand
+        //public ReadOnlyCollection<Card> OpenCards { get; }
+        public ReadOnlyCollection<Card> CardsInHand { get; }
+        public int TotalGamePoints 
         {
-            get
+            get 
             {
-                return cardsInHand;
+                int value = openCards.Sum(c => c.GamePoints);
+                return value;
+            }
+        }
+
+        private void ToProcessDestructionCard(object sender, EventArgs args)
+        {
+            if (sender is Card card && openCards.Contains(card))
+            {
+                openCards.Remove(card);
+                card.Destroy -= ToProcessDestructionCard;
             }
         }
 
@@ -50,6 +66,10 @@ namespace Assets.Models
         {
             if (args.Player == this)
             {
+                //foreach (var card in args.Cards)
+                //{
+                //    card.Destroy += ToProcessDestructionCard;
+                //}
                 cardsInHand.AddRange(args.Cards);
             }
         }
@@ -60,6 +80,7 @@ namespace Assets.Models
 
             MakeMove?.Invoke(this, new MakeMoveEventArgs(card));
             cardsInHand.Remove(card);
+            openCards.Add(card);
             CurrentCard = card;
             card.ActivateBehaviour();
 
@@ -77,7 +98,7 @@ namespace Assets.Models
         {
             if (CurrentCard != null && CurrentCard.IsActivateBehaviour)
             {
-                PlayCurrentCard?.Invoke(this, new MakeMoveEventArgs(targetCard));
+                PlayCurrentCard?.Invoke(this, new MakeMoveEventArgs(CurrentCard, targetCard));
 
                 if (!CurrentCard.IsActivateBehaviour)
                     CompleteMove();

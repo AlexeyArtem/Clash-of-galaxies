@@ -17,11 +17,13 @@ namespace Assets.Models
 
         protected override void ProcessPlayedCard(object sender, MakeMoveEventArgs args)
         {
-            base.ProcessPlayedCard(sender, args);
-            var targetCards = openCards.Where(p => p.Key == owner).FirstOrDefault().Value;
-            if (!targetCards.Contains(args.Card)) return;
+            //base.ProcessPlayedCard(sender, args);
+            if (!CheckEventArgs(args)) return;
 
-            Card targetCard = args.Card;
+            var targetCards = openCards.Where(p => p.Key == owner).FirstOrDefault().Value;
+            if (!targetCards.Contains(args.TargetCard)) return;
+
+            Card targetCard = args.TargetCard;
             if (targetCard.Name == "Planet") // В два раза сильнее усилить, если выбрана карта Планеты
             {
                 int influencingGamePoints = InfluencingGamePoints;

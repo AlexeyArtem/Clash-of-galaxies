@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using Assets.Views;
 
 public class DropPlaceScr : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerExitHandler
 {
@@ -10,7 +11,7 @@ public class DropPlaceScr : MonoBehaviour, IDropHandler, IPointerEnterHandler, I
     // Start is called before the first frame update
     void Start()
     {
-        playerView = gameObject.GetComponentInParent<PlayerView>();
+        playerView = FindObjectOfType<PlayerView>();
     }
 
     // Update is called once per frame
@@ -19,7 +20,7 @@ public class DropPlaceScr : MonoBehaviour, IDropHandler, IPointerEnterHandler, I
         
     }
 
-    //Привидение мыши к границам объекта
+    // Привидение мыши к границам объекта
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (eventData.pointerDrag == null)
@@ -30,7 +31,7 @@ public class DropPlaceScr : MonoBehaviour, IDropHandler, IPointerEnterHandler, I
             cardView.DefaultTempCardParent = transform;
     }
 
-    //Отведение мыши от границ объекта
+    // Отведение мыши от границ объекта
     public void OnPointerExit(PointerEventData eventData)
     {
         if (eventData.pointerDrag == null) return;
@@ -46,7 +47,6 @@ public class DropPlaceScr : MonoBehaviour, IDropHandler, IPointerEnterHandler, I
             return;
 
         CardView cardView = eventData.pointerDrag.GetComponent<CardView>();
-
-        playerView.DropCardCallback.Invoke(cardView); // Вызов события хода выбранной карты, на которое подписан контроллер
+        playerView.DropCardCallback.Invoke(cardView); // Вызов события хода выбранной карты, на которое подписан презентер игрока
     }
 }

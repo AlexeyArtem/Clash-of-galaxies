@@ -15,9 +15,9 @@ namespace Assets.Presenters
         private IPlayerView playerView;
         private List<CardPresenter> cardPresenters;
 
-        public IReadOnlyCollection<CardPresenter> CardPresenters 
+        public IReadOnlyCollection<CardPresenter> CardPresentersInHand
         {
-            get 
+            get
             {
                 return cardPresenters;
             }
@@ -34,19 +34,33 @@ namespace Assets.Presenters
             {
                 CardView cardView = CardViewFactory.GetInstance().GetView();
                 cardViews.Add(cardView);
-                cardPresenters.Add(new CardPresenter(card, cardView));
+
+                CardPresenter cardPresenter = CardPresenterFactory.GetInstance().CreateNewPresenter(card, cardView);
+                if(cardPresenter != null) cardPresenters.Add(cardPresenter);
             }
             playerView.SetCardViews(cardViews);
+
             playerView.DropCardCallback = DropCardView;
+            playerView.PlayCurrentCardCallback = PlayCurrentCardView;
         }
 
         public void DropCardView(ICardView cardView)
         {
-            CardPresenter cardPresenter = cardPresenters.Where(c => c.CardView == cardView).FirstOrDefault();
+            CardPresenter cardPresenter = CardPresenterFactory.GetInstance().FindPresenter(cardView);
             if (cardPresenter != null) 
             {
                 Card card = cardPresenter.Card;
                 player.OnMakeMove(card);
+            }
+        }
+
+        public void PlayCurrentCardView(ICardView cardView) 
+        {
+            CardPresenter cardPresenter = CardPresenterFactory.GetInstance().FindPresenter(cardView);
+            if (cardPresenter != null)
+            {
+                Card card = cardPresenter.Card;
+                player.OnPlayCurrentCard(card);
             }
         }
     }

@@ -24,9 +24,17 @@ namespace Assets.Models
             }
         }
 
-        protected virtual void ProcessPlayedCard(object sender, MakeMoveEventArgs args)
+        protected bool CheckEventArgs(MakeMoveEventArgs args) 
         {
-            if (currentCard == null || !IsActivate) return;
+            if (currentCard == null || currentCard != args.Card || currentCard == args.TargetCard)
+                return false;
+            
+            if (!IsActivate)
+                return false;
+
+            return true;
         }
+
+        protected abstract void ProcessPlayedCard(object sender, MakeMoveEventArgs args);
     }
 }

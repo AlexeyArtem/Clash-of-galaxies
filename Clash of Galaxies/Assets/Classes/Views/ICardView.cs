@@ -9,5 +9,8 @@ namespace Assets.Views
     public interface ICardView
     {
         void SetCardInfo(string name, string description, int gamePoints, int influenceGamePoints);
+        void SetActiveCardShirt(bool isActive);
+        void ChangeGamePoints(int gamePoints);
+        void DestroyView();
     }
 }

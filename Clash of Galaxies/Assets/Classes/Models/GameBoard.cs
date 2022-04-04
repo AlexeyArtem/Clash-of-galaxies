@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Assets.Models
 {
-    //An area with open playing cards. Responsible for processing moves
+    // An area with open playing cards. Responsible for processing moves
     public class GameBoard
     {
         private Dictionary<Player, List<Card>> openCards;
@@ -18,12 +18,17 @@ namespace Assets.Models
                 { playerA, new List<Card>() },
                 { playerB, new List<Card>() }
             };
+            PlayerA = playerA;
+            PlayerB = playerB;
             playerA.MakeMove += ToProcessMove;
             playerB.MakeMove += ToProcessMove;
         }
 
-        // Заглушка для теста
+        // For testing
         public event MakeMoveEventHandler NewOpenCard;
+
+        public Player PlayerA { get; }
+        public Player PlayerB { get; }
 
         public IReadOnlyDictionary<Player, List<Card>> OpenCards
         {
@@ -33,6 +38,11 @@ namespace Assets.Models
             }
         }
 
+        private void OnNewOpenCard(Player player, Card card) 
+        {
+            NewOpenCard?.Invoke(this, new MakeMoveEventArgs(player, card));
+        }
+
         private void ToProcessMove(object sender, MakeMoveEventArgs args)
         {
             if (sender is Player player && openCards.ContainsKey(player))
@@ -40,7 +50,7 @@ namespace Assets.Models
                 Card card = args.Card;
                 openCards[player].Add(card);
                 card.Destroy += ToProcessDestructionCard;
-                NewOpenCard?.Invoke(this, new MakeMoveEventArgs(card));
+                OnNewOpenCard(player, card);
             }
         }
 

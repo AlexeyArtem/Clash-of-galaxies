@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Assets.Models
 {
-    public class Card
+    public class Card : INotifyPropertyChanged
     {
         private int gamePoints;
         private Behaviour behaviour = null;
@@ -14,7 +16,7 @@ namespace Assets.Models
         public Card(string name, int gamePoints, string description)
         {
             Name = name;
-            GamePoints = gamePoints;
+            this.gamePoints = gamePoints;
             Description = description;
         }
 
@@ -24,6 +26,7 @@ namespace Assets.Models
         }
 
         public event EventHandler Destroy;
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public string Name { get; }
         public string Description { get; }
@@ -52,9 +55,18 @@ namespace Assets.Models
             protected set
             {
                 gamePoints = value;
-                if (gamePoints <= 0)
+                if (gamePoints <= 0) 
+                {
                     OnDestroy();
+                    return;
+                }
+                NotifyPropertyChanged();
             }
+        }
+
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         private void OnDestroy()

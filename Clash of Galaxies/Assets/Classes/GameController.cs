@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Assets.Models;
 using Assets.Presenters;
+using System.Collections.ObjectModel;
 
 public class GameController : MonoBehaviour
 {
@@ -11,11 +12,6 @@ public class GameController : MonoBehaviour
 
     private PlayerPresenter playerUserPresenter, playerEnemyPresenter;
     private GameBoardPresenter gameBoardPresenterUser, gameBoardPresenterEnemy;
-    
-    // All controllers next level:
-    // - Game board controller
-    // - Players controllers
-    //
 
     private void Awake()
     {
@@ -31,14 +27,21 @@ public class GameController : MonoBehaviour
         PlayerView playerView = FindObjectOfType<PlayerView>();
         playerUserPresenter = new PlayerPresenter(playerUser, playerView);
 
-        GameBoardView gameBoardView = GameObject.Find("PlayerUserUI").GetComponentInChildren<GameBoardView>();
-        gameBoardPresenterUser = new GameBoardPresenter(game.GameBoard, gameBoardView, playerUserPresenter.CardPresenters);
+        GameBoardView gameBoardView1 = FindObjectOfType<GameBoardView>();
+        GameBoardPresenter gameBoardPresenter = new GameBoardPresenter(game.GameBoard, gameBoardView1);
+
+        //GameBoardView gameBoardView = GameObject.Find("SelfField").GetComponent<GameBoardView>();
+        //gameBoardPresenterUser = new GameBoardPresenter(game.GameBoard, gameBoardView, playerUserPresenter.CardPresentersInHand);
 
         PlayerEnemyView playerEnemyView = FindObjectOfType<PlayerEnemyView>();
         playerEnemyPresenter = new PlayerPresenter(playerEnemy, playerEnemyView);
+        
+        //GameBoardView gameBoardEnemyView = GameObject.Find("EnemyField").GetComponent<GameBoardView>();
+        //gameBoardPresenterEnemy = new GameBoardPresenter(game.GameBoard, gameBoardEnemyView, playerEnemyPresenter.CardPresentersInHand);
 
-        GameBoardView gameBoardEnemyView = GameObject.Find("PlayerEnemyUI").GetComponentInChildren<GameBoardView>();
-        gameBoardPresenterEnemy = new GameBoardPresenter(game.GameBoard, gameBoardEnemyView, playerEnemyPresenter.CardPresenters);
+        // Для теста
+        playerEnemy.OnMakeMove(playerEnemy.CardsInHand[0]);
+        playerEnemy.OnMakeMove(playerEnemy.CardsInHand[0]);
     }
 
     // Update is called once per frame
