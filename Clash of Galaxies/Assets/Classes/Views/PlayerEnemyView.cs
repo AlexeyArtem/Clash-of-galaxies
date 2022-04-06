@@ -8,6 +8,7 @@ public class PlayerEnemyView : MonoBehaviour, IPlayerView
 {
     public Action<ICardView> DropCardCallback { get; set; }
     public Action<ICardView> PlayCurrentCardCallback { get; set; }
+    public Action EndMakeMoveCallback { get; set; }
 
     // Start is called before the first frame update
     void Start()

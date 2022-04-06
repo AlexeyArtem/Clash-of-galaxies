@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Assets.Models;
 using Assets.Presenters;
+using Assets.Views;
 using System.Collections.ObjectModel;
 
 public class GameController : MonoBehaviour
@@ -12,6 +13,10 @@ public class GameController : MonoBehaviour
 
     private PlayerPresenter playerUserPresenter, playerEnemyPresenter;
     private GameBoardPresenter gameBoardPresenterUser, gameBoardPresenterEnemy;
+    private PlayerGameResultPresenter playerGameResultPresenterUser, playerGameResultPresenterEnemy;
+    private TimerPresenter timerPresenter;
+
+    public GameObject GameResultUserObj, GameResultEnemyObj, TimerTextObj;
 
     private void Awake()
     {
@@ -35,13 +40,20 @@ public class GameController : MonoBehaviour
 
         PlayerEnemyView playerEnemyView = FindObjectOfType<PlayerEnemyView>();
         playerEnemyPresenter = new PlayerPresenter(playerEnemy, playerEnemyView);
-        
+
+        playerGameResultPresenterUser = new PlayerGameResultPresenter(game.PlayersResults[playerUser], GameResultUserObj.GetComponent<PlayerGameResultView>());
+        playerGameResultPresenterEnemy = new PlayerGameResultPresenter(game.PlayersResults[playerEnemy], GameResultEnemyObj.GetComponent<PlayerGameResultView>());
+
+        timerPresenter = new TimerPresenter(game, TimerTextObj.GetComponent<TimerView>());
+
         //GameBoardView gameBoardEnemyView = GameObject.Find("EnemyField").GetComponent<GameBoardView>();
         //gameBoardPresenterEnemy = new GameBoardPresenter(game.GameBoard, gameBoardEnemyView, playerEnemyPresenter.CardPresentersInHand);
 
         // Для теста
-        playerEnemy.OnMakeMove(playerEnemy.CardsInHand[0]);
-        playerEnemy.OnMakeMove(playerEnemy.CardsInHand[0]);
+        //playerEnemy.OnMakeMove(playerEnemy.CardsInHand[0]);
+        //playerEnemy.OnMakeMove(playerEnemy.CardsInHand[0]);
+        //playerUser.OnMakeMove(playerUser.CardsInHand[0]);
+        //game.RefreshPlayersResults();
     }
 
     // Update is called once per frame

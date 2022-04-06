@@ -11,6 +11,6 @@ namespace Assets.Models
         public static readonly int MaxRounds = 3;
         public static readonly int MaxStartPlayerCards = 6;
         public static readonly int MaxCardsInDeck = MaxStartPlayerCards * 2;
-        public static readonly int TimeToMoveInSeconds = 30;
+        public static readonly int MaxTimeToMoveInSeconds = 30;
     }
 }

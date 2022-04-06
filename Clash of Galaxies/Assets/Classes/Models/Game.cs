@@ -4,52 +4,62 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.ObjectModel;
+using UnityEngine;
+using System.Collections;
 
 namespace Assets.Models
 {
     public class Game
     {
-        private static Random rand = new Random();
+        private static System.Random rand = new System.Random();
 
         private Player playerA, playerB;
         private GameInfo gameInfo;
         private Dictionary<Player, Stack<Card>> decks;
-        private GameBoard gameBoard;
-        public Cards cards; //public на время теста
+        private Dictionary<Player, PlayerGameResult> playersResults;
 
         private Timer moveTimer;
         private int currentMoveTime;
         private Player playerCurrentMove;
+        private System.Timers.Timer timer;
 
         public Game(Player playerA, Player playerB)
         {
             if (playerA == playerB)
-                throw new ArgumentException("The players match");
+                throw new ArgumentException("The players is match");
 
             this.playerA = playerA;
             this.playerB = playerB;
-            gameBoard = new GameBoard(playerA, playerB);
-            cards = Cards.GetInstance(gameBoard.OpenCards);
+            GameBoard = new GameBoard(playerA, playerB);
+            Cards = Cards.GetInstance(GameBoard.OpenCards);
 
             decks = new Dictionary<Player, Stack<Card>>()
             {
                 { playerA, new Stack<Card>() },
                 { playerB, new Stack<Card>() },
             };
-
-            PermissionMakeMove += playerA.GetPermissionToMove;
-            PermissionMakeMove += playerB.GetPermissionToMove;
-            DealCards += playerA.GetCardsInHand;
-            DealCards += playerB.GetCardsInHand;
-        }
-
-        public GameBoard GameBoard 
-        {
-            get 
+            Decks = new ReadOnlyDictionary<Player, Stack<Card>>(decks);
+            playersResults = new Dictionary<Player, PlayerGameResult>()
             {
-                return gameBoard;
-            }
+                {playerA, new PlayerGameResult() },
+                {playerB, new PlayerGameResult() },
+            };
+            PlayersResults = new ReadOnlyDictionary<Player, PlayerGameResult>(playersResults);
+
+            PermissionMakeMove += playerA.SetPermissionToMove;
+            PermissionMakeMove += playerB.SetPermissionToMove;
+            DealCards += playerA.SetCardsInHand;
+            DealCards += playerB.SetCardsInHand;
         }
+
+        public event EventHandler ChangeMakeMove;
+
+        public int CurrentRound { get; private set; } = 1;
+        public Cards Cards { get; }
+        public GameBoard GameBoard { get; }
+        public IReadOnlyDictionary<Player, Stack<Card>> Decks { get; }
+        public IReadOnlyDictionary<Player, PlayerGameResult> PlayersResults { get; }
 
         private event PermissionMakeMoveEventHandler PermissionMakeMove;
         private event DealCardsEventHandler DealCards;
@@ -61,11 +71,16 @@ namespace Assets.Models
             Stack<Card> deckCards = new Stack<Card>();
             for (int i = 0; i < GameRules.MaxCardsInDeck; i++)
             {
-                int index = rand.Next(0, cards.Count);
-                Card card = cards.Get(player, index);
+                int index = rand.Next(0, Cards.Count);
+                Card card = Cards.Get(player, index);
                 deckCards.Push(card);
             }
             decks[player] = deckCards;
+        }
+
+        private void OnChangeMakeMove() 
+        {
+            ChangeMakeMove?.Invoke(this, new EventArgs());
         }
 
         private void OnPermissionMakeMove(Player player, bool isPermissionMakeMove)
@@ -94,16 +109,24 @@ namespace Assets.Models
 
         private void OnEndGame()
         {
-            moveTimer.Dispose();
+            moveTimer?.Dispose();
             OnPermissionMakeMove(playerA, false);
             OnPermissionMakeMove(playerB, false);
         }
 
-        private void CheckStateMoveCallback(object state)
+        public void RefreshPlayersResults()
         {
-            if (currentMoveTime >= GameRules.TimeToMoveInSeconds || playerCurrentMove.IsMoveCompleted)
+            playersResults[playerA].TotalGamePoints = GameBoard.GetTotalGamePoints(playerA);
+            playersResults[playerB].TotalGamePoints = GameBoard.GetTotalGamePoints(playerB);
+        }
+
+        // Вызывать метод каждую секунду внутри корутины в UI
+        public void CheckStateMakeMove(int timeToMoveInSeconds)
+        {
+            RefreshPlayersResults();
+            if (timeToMoveInSeconds > GameRules.MaxTimeToMoveInSeconds || playerCurrentMove.IsMoveCompleted)
             {
-                CheckRound();
+                //CheckRound();
 
                 if (playerCurrentMove == playerA)
                 {
@@ -115,36 +138,32 @@ namespace Assets.Models
                     OnPermissionMakeMove(playerB, false);
                     AllowMove(playerA);
                 }
-
-                return;
             }
-            currentMoveTime += 1;
         }
 
         private void AllowMove(Player player)
         {
             OnPermissionMakeMove(player, true);
             playerCurrentMove = player;
-            moveTimer?.Dispose();
-            currentMoveTime = 0;
-            moveTimer = new Timer(CheckStateMoveCallback, null, 0, 1000);
+            OnChangeMakeMove();
         }
 
         public void CheckRound()
         {
             if (decks[playerA].Count != 0 || decks[playerB].Count != 0) return;
 
-            if (gameBoard.GetGamePoints(playerA) > gameBoard.GetGamePoints(playerB)) gameInfo.AddRoundWin(playerA);
-            else if (gameBoard.GetGamePoints(playerA) < gameBoard.GetGamePoints(playerB)) gameInfo.AddRoundWin(playerB);
-            else gameInfo.AddRoundDraw();
+            if (GameBoard.GetTotalGamePoints(playerA) > GameBoard.GetTotalGamePoints(playerB)) playersResults[playerA].AddRoundWin();
+            else if (GameBoard.GetTotalGamePoints(playerA) < GameBoard.GetTotalGamePoints(playerB)) playersResults[playerB].AddRoundWin();
+            CurrentRound += 1;
+            // Вызов события конца раунда (остановка корутины)
 
-            if (gameInfo.RoundWins[playerA] != gameInfo.RoundWins[playerB] && gameInfo.CurrentRound >= GameRules.MaxRounds)
+            if (playersResults[playerA].RoundsWins != playersResults[playerB].RoundsWins && CurrentRound >= GameRules.MaxRounds)
             {
                 OnEndGame();
                 return;
             }
 
-            StartRound();
+            // Вызов начало следующего раунда (старт корутины)
         }
 
         public void StartRound()
@@ -156,10 +175,10 @@ namespace Assets.Models
             OnDealCards(playerB, GameRules.MaxStartPlayerCards);
 
             // На время тестирования
-            OnPermissionMakeMove(playerA, true);
-            OnPermissionMakeMove(playerB, true);
-
-            //AllowMove(playerA);
+            //OnPermissionMakeMove(playerA, true);
+            //OnPermissionMakeMove(playerB, true);
+            
+            AllowMove(playerA);
         }
     }
 }

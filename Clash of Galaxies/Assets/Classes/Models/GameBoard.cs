@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,6 +19,7 @@ namespace Assets.Models
                 { playerA, new List<Card>() },
                 { playerB, new List<Card>() }
             };
+            OpenCards = new ReadOnlyDictionary<Player, List<Card>>(openCards);
             PlayerA = playerA;
             PlayerB = playerB;
             playerA.MakeMove += ToProcessMove;
@@ -30,13 +32,7 @@ namespace Assets.Models
         public Player PlayerA { get; }
         public Player PlayerB { get; }
 
-        public IReadOnlyDictionary<Player, List<Card>> OpenCards
-        {
-            get
-            {
-                return openCards;
-            }
-        }
+        public IReadOnlyDictionary<Player, List<Card>> OpenCards { get; }
 
         private void OnNewOpenCard(Player player, Card card) 
         {
@@ -69,7 +65,7 @@ namespace Assets.Models
             }
         }
 
-        public int GetGamePoints(Player player)
+        public int GetTotalGamePoints(Player player)
         {
             int sum = openCards[player].Sum(c => c.GamePoints);
             return sum;

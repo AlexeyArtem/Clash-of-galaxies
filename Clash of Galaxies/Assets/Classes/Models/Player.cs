@@ -10,15 +10,14 @@ namespace Assets.Models
     public class Player
     {
         protected List<Card> cardsInHand;
-        protected List<Card> openCards;
+        protected bool isPermissionMakeMove = false;
+        protected object lockObj = new object();
 
         public Player(string name)
         {
             Name = name;
             cardsInHand = new List<Card>();
-            openCards = new List<Card>();
             CardsInHand = new ReadOnlyCollection<Card>(cardsInHand);
-            //OpenCards = new ReadOnlyCollection<Card>(openCards);
         }
 
         public event MakeMoveEventHandler MakeMove;
@@ -26,61 +25,48 @@ namespace Assets.Models
 
         public string Name { get; }
         public Card CurrentCard { get; protected set; }
-        public bool IsMoveCompleted { get; protected set; } = true;
-        public bool IsPermissionMakeMove { get; protected set; } = false;
-        //public ReadOnlyCollection<Card> OpenCards { get; }
-        public ReadOnlyCollection<Card> CardsInHand { get; }
-        public int TotalGamePoints 
+        public bool IsMoveCompleted { get; protected set; } = false;
+        public bool IsPermissionMakeMove 
         {
             get 
             {
-                int value = openCards.Sum(c => c.GamePoints);
-                return value;
+                return isPermissionMakeMove;
             }
-        }
-
-        private void ToProcessDestructionCard(object sender, EventArgs args)
-        {
-            if (sender is Card card && openCards.Contains(card))
+            protected set 
             {
-                openCards.Remove(card);
-                card.Destroy -= ToProcessDestructionCard;
+                isPermissionMakeMove = value;
             }
         }
+        public ReadOnlyCollection<Card> CardsInHand { get; }
 
-        public void GetPermissionToMove(object sender, PermissionMakeMoveEventArgs args)
+
+        public void SetPermissionToMove(object sender, PermissionMakeMoveEventArgs args)
         {
             if (args.Player == this)
             {
                 IsPermissionMakeMove = args.IsPermissionMakeMove;
+                if (IsPermissionMakeMove)
+                {
+                    IsMoveCompleted = false;
+                    CurrentCard = null;
+                }
             }
         }
 
-        public void SetStartCardsInHand(List<Card> cards)
-        {
-            cardsInHand = cards;
-            CurrentCard = null;
-        }
-
-        public void GetCardsInHand(object sender, DealCardsEventArgs args)
+        public void SetCardsInHand(object sender, DealCardsEventArgs args)
         {
             if (args.Player == this)
             {
-                //foreach (var card in args.Cards)
-                //{
-                //    card.Destroy += ToProcessDestructionCard;
-                //}
                 cardsInHand.AddRange(args.Cards);
             }
         }
 
         public void OnMakeMove(Card card)
         {
-            if (!cardsInHand.Contains(card) || !IsPermissionMakeMove) return;
+            if (!cardsInHand.Contains(card) || !IsPermissionMakeMove || CurrentCard != null) return;
 
             MakeMove?.Invoke(this, new MakeMoveEventArgs(card));
             cardsInHand.Remove(card);
-            openCards.Add(card);
             CurrentCard = card;
             card.ActivateBehaviour();
 

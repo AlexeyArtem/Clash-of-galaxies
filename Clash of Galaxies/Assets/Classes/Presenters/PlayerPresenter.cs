@@ -12,6 +12,7 @@ namespace Assets.Presenters
     class PlayerPresenter
     {
         private Player player;
+        private Game game;
         private IPlayerView playerView;
         private List<CardPresenter> cardPresenters;
 
@@ -42,6 +43,12 @@ namespace Assets.Presenters
 
             playerView.DropCardCallback = DropCardView;
             playerView.PlayCurrentCardCallback = PlayCurrentCardView;
+            playerView.EndMakeMoveCallback = ComleteMove;
+        }
+
+        public void ComleteMove() 
+        {
+            player.CompleteMove();
         }
 
         public void DropCardView(ICardView cardView)
