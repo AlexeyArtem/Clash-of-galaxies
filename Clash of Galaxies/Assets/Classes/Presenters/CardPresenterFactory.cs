@@ -17,7 +17,14 @@ namespace Assets.Presenters
         private CardPresenterFactory() 
         {
             presenters = new List<CardPresenter>();
-            //Presenters = new ReadOnlyCollection<CardPresenter>(presenters);
+        }
+
+        private void Card_Destroy(object sender, EventArgs e)
+        {
+            Card card = sender as Card;
+            CardPresenter cardPresenter = presenters.Where(c => card == c.Card || c.Card == null)?.FirstOrDefault();
+            presenters.Remove(cardPresenter);
+            card.Destroy -= Card_Destroy;
         }
 
         public ReadOnlyCollection<CardPresenter> Presenters { get; }
@@ -36,6 +43,7 @@ namespace Assets.Presenters
                 return null;
 
             CardPresenter cardPresenter = new CardPresenter(card, cardView);
+            card.Destroy += Card_Destroy;
             presenters.Add(cardPresenter);
 
             return cardPresenter;

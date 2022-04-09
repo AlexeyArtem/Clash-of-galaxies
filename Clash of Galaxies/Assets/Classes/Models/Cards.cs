@@ -8,10 +8,10 @@ namespace Assets.Models
 {
     public class Cards
     {
-        private static Cards instance;
+        //private static Cards instance;
         private Dictionary<Player, List<Card>> valuesCards;
 
-        private Cards(IReadOnlyDictionary<Player, List<Card>> openCards)
+        public Cards(IReadOnlyDictionary<Player, List<Card>> openCards)
         {
             valuesCards = new Dictionary<Player, List<Card>>();
             foreach (Player player in openCards.Keys)
@@ -39,13 +39,13 @@ namespace Assets.Models
             }
         }
 
-        public static Cards GetInstance(IReadOnlyDictionary<Player, List<Card>> openCards)
-        {
-            if (instance == null)
-                instance = new Cards(openCards);
+        //public static Cards GetInstance(IReadOnlyDictionary<Player, List<Card>> openCards)
+        //{
+        //    if (instance == null)
+        //        instance = new Cards(openCards);
 
-            return instance;
-        }
+        //    return instance;
+        //}
 
         public int Count { get; private set; }
 

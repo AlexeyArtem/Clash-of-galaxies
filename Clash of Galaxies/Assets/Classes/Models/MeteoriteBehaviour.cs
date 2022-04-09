@@ -18,7 +18,7 @@ namespace Assets.Models
         public override void Activate(Card card)
         {
             if (owner.CurrentCard != card) return;
-            var targetCards = openCards.Where(p => p.Key != owner).FirstOrDefault().Value;
+            var targetCards = openCards.Where(p => p.Key != owner).FirstOrDefault().Value.ToList();
 
             IsActivate = true;
             foreach (Card targetCard in targetCards)

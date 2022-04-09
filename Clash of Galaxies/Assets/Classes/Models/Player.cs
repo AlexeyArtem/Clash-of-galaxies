@@ -1,23 +1,25 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 namespace Assets.Models
 {
     public class Player
     {
-        protected List<Card> cardsInHand;
+        protected ObservableCollection<Card> cardsInHand;
         protected bool isPermissionMakeMove = false;
-        protected object lockObj = new object();
 
         public Player(string name)
         {
             Name = name;
-            cardsInHand = new List<Card>();
-            CardsInHand = new ReadOnlyCollection<Card>(cardsInHand);
+            cardsInHand = new ObservableCollection<Card>();
+            CardsInHand = new ReadOnlyObservableCollection<Card>(cardsInHand);
         }
 
         public event MakeMoveEventHandler MakeMove;
@@ -26,7 +28,7 @@ namespace Assets.Models
         public string Name { get; }
         public Card CurrentCard { get; protected set; }
         public bool IsMoveCompleted { get; protected set; } = false;
-        public bool IsPermissionMakeMove 
+        public virtual bool IsPermissionMakeMove 
         {
             get 
             {
@@ -37,10 +39,9 @@ namespace Assets.Models
                 isPermissionMakeMove = value;
             }
         }
-        public ReadOnlyCollection<Card> CardsInHand { get; }
+        public ReadOnlyObservableCollection<Card> CardsInHand { get; }
 
-
-        public void SetPermissionToMove(object sender, PermissionMakeMoveEventArgs args)
+        public virtual void SetPermissionToMove(object sender, PermissionMakeMoveEventArgs args)
         {
             if (args.Player == this)
             {
@@ -57,11 +58,14 @@ namespace Assets.Models
         {
             if (args.Player == this)
             {
-                cardsInHand.AddRange(args.Cards);
+                foreach (var card in args.Cards)
+                {
+                    cardsInHand.Add(card);
+                }
             }
         }
 
-        public void OnMakeMove(Card card)
+        public virtual void OnMakeMove(Card card)
         {
             if (!cardsInHand.Contains(card) || !IsPermissionMakeMove || CurrentCard != null) return;
 
@@ -89,6 +93,14 @@ namespace Assets.Models
                 if (!CurrentCard.IsActivateBehaviour)
                     CompleteMove();
             }
+        }
+
+        public void ClearCardsInHand() 
+        {
+            foreach (var card in cardsInHand)
+                card.OnDestroy();
+
+            cardsInHand.Clear();
         }
     }
 }

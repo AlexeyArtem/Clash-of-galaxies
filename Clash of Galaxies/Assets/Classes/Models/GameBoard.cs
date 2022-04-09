@@ -70,5 +70,14 @@ namespace Assets.Models
             int sum = openCards[player].Sum(c => c.GamePoints);
             return sum;
         }
+
+        public void ClearOpenCards() 
+        {
+            foreach (var card in openCards[PlayerA].ToList())
+                card.OnDestroy();
+
+            foreach (var card in openCards[PlayerB].ToList())
+                card.OnDestroy();
+        }
     }
 }

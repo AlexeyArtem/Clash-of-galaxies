@@ -69,7 +69,7 @@ namespace Assets.Models
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private void OnDestroy()
+        public void OnDestroy()
         {
             Destroy?.Invoke(this, new EventArgs());
         }

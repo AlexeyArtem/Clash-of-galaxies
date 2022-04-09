@@ -6,44 +6,53 @@ using System.Threading.Tasks;
 using Assets.Models;
 using UnityEngine;
 using Assets.Views;
+using System.ComponentModel;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 
 namespace Assets.Presenters
 {
     class PlayerPresenter
     {
         private Player player;
-        private Game game;
         private IPlayerView playerView;
-        private List<CardPresenter> cardPresenters;
-
-        public IReadOnlyCollection<CardPresenter> CardPresentersInHand
-        {
-            get
-            {
-                return cardPresenters;
-            }
-        }
 
         public PlayerPresenter(Player player, IPlayerView playerView)
         {
             this.player = player;
             this.playerView = playerView;
-            cardPresenters = new List<CardPresenter>();
 
-            List<ICardView> cardViews = new List<ICardView>(); 
-            foreach (var card in player.CardsInHand)
-            {
-                CardView cardView = CardViewFactory.GetInstance().GetView();
-                cardViews.Add(cardView);
-
-                CardPresenter cardPresenter = CardPresenterFactory.GetInstance().CreateNewPresenter(card, cardView);
-                if(cardPresenter != null) cardPresenters.Add(cardPresenter);
-            }
+            List<ICardView> cardViews = GetCardViews(player.CardsInHand);
             playerView.SetCardViews(cardViews);
 
             playerView.DropCardCallback = DropCardView;
             playerView.PlayCurrentCardCallback = PlayCurrentCardView;
             playerView.EndMakeMoveCallback = ComleteMove;
+
+            var collectionCards = (INotifyCollectionChanged)player.CardsInHand;
+            collectionCards.CollectionChanged += CollectionCards_CollectionChanged;
+        }
+
+        private void CollectionCards_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add) 
+            {
+                var cards = e.NewItems.Cast<Card>();
+                List<ICardView> cardViews = GetCardViews(cards);
+                playerView.SetCardViews(cardViews);
+            }
+        }
+
+        private List<ICardView> GetCardViews(IEnumerable<Card> cards) 
+        {
+            List<ICardView> cardViews = new List<ICardView>();
+            foreach (var card in cards)
+            {
+                ICardView cardView = CardViewFactory.GetInstance().GetNewView();
+                CardPresenterFactory.GetInstance().CreateNewPresenter(card, cardView);
+                cardViews.Add(cardView);
+            }
+            return cardViews;
         }
 
         public void ComleteMove() 

@@ -12,15 +12,6 @@ namespace Assets.Presenters
     {
         private GameBoard gameBoard;
         private IGameBoardView gameBoardView;
-        private IReadOnlyCollection<CardPresenter> cardPresenters;
-
-        public GameBoardPresenter(GameBoard gameBoard, IGameBoardView gameBoardView, IReadOnlyCollection<CardPresenter> cardPresenters)
-        {
-            this.gameBoard = gameBoard;
-            this.gameBoardView = gameBoardView;
-            this.cardPresenters = cardPresenters;
-            gameBoard.NewOpenCard += GameBoard_NewOpenCard;
-        }
 
         public GameBoardPresenter(GameBoard gameBoard, IGameBoardView gameBoardView)
         {
@@ -31,11 +22,6 @@ namespace Assets.Presenters
 
         private void GameBoard_NewOpenCard(object sender, MakeMoveEventArgs args)
         {
-            //CardPresenter cardPresenter = cardPresenters.Where(c => c.Card == args.Card)?.FirstOrDefault();
-            //if (cardPresenter != null) 
-            //{
-            //    gameBoardView.SetCardView(cardPresenter.CardView);
-            //}
             CardPresenter cardPresenter = CardPresenterFactory.GetInstance().FindPresenter(args.Card);
             if (cardPresenter != null)
             {

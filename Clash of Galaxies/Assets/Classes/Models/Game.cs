@@ -5,24 +5,19 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
-using UnityEngine;
 using System.Collections;
 
 namespace Assets.Models
 {
     public class Game
     {
-        private static System.Random rand = new System.Random();
+        private static Random rand = new Random();
 
         private Player playerA, playerB;
-        private GameInfo gameInfo;
         private Dictionary<Player, Stack<Card>> decks;
         private Dictionary<Player, PlayerGameResult> playersResults;
 
-        private Timer moveTimer;
-        private int currentMoveTime;
         private Player playerCurrentMove;
-        private System.Timers.Timer timer;
 
         public Game(Player playerA, Player playerB)
         {
@@ -32,7 +27,7 @@ namespace Assets.Models
             this.playerA = playerA;
             this.playerB = playerB;
             GameBoard = new GameBoard(playerA, playerB);
-            Cards = Cards.GetInstance(GameBoard.OpenCards);
+            Cards = new Cards(GameBoard.OpenCards);
 
             decks = new Dictionary<Player, Stack<Card>>()
             {
@@ -53,8 +48,6 @@ namespace Assets.Models
             DealCards += playerB.SetCardsInHand;
         }
 
-        public event EventHandler ChangeMakeMove;
-
         public int CurrentRound { get; private set; } = 1;
         public Cards Cards { get; }
         public GameBoard GameBoard { get; }
@@ -63,24 +56,18 @@ namespace Assets.Models
 
         private event PermissionMakeMoveEventHandler PermissionMakeMove;
         private event DealCardsEventHandler DealCards;
-
-        private void GenerateDeck(Player player)
-        {
-            if (decks[player].Count > 0) return;
-
-            Stack<Card> deckCards = new Stack<Card>();
-            for (int i = 0; i < GameRules.MaxCardsInDeck; i++)
-            {
-                int index = rand.Next(0, Cards.Count);
-                Card card = Cards.Get(player, index);
-                deckCards.Push(card);
-            }
-            decks[player] = deckCards;
-        }
+        public event EventHandler ChangedMakeMove;
+        public event EndRoundEventHandler EndRound;
+        public event EndRoundEventHandler EndGame;
 
         private void OnChangeMakeMove() 
         {
-            ChangeMakeMove?.Invoke(this, new EventArgs());
+            ChangedMakeMove?.Invoke(this, new EventArgs());
+        }
+
+        private void OnEndRound(Player winPlayer) 
+        {
+            EndRound?.Invoke(this, new EndRoundEventArgs(winPlayer));
         }
 
         private void OnPermissionMakeMove(Player player, bool isPermissionMakeMove)
@@ -107,38 +94,33 @@ namespace Assets.Models
             DealCards?.Invoke(this, args);
         }
 
-        private void OnEndGame()
+        public void OnEndGame(Player winPLayer)
         {
-            moveTimer?.Dispose();
             OnPermissionMakeMove(playerA, false);
             OnPermissionMakeMove(playerB, false);
+            // Вызов события окончания игры
+            EndGame?.Invoke(this, new EndRoundEventArgs(winPLayer));
+
+            // Отписка от всех событий
+            PermissionMakeMove = null;
+            DealCards = null;
+            ChangedMakeMove = null;
+            EndRound = null;
+            EndGame = null;
         }
 
-        public void RefreshPlayersResults()
+        private void GenerateDeck(Player player)
         {
-            playersResults[playerA].TotalGamePoints = GameBoard.GetTotalGamePoints(playerA);
-            playersResults[playerB].TotalGamePoints = GameBoard.GetTotalGamePoints(playerB);
-        }
+            if (decks[player].Count > 0) return;
 
-        // Вызывать метод каждую секунду внутри корутины в UI
-        public void CheckStateMakeMove(int timeToMoveInSeconds)
-        {
-            RefreshPlayersResults();
-            if (timeToMoveInSeconds > GameRules.MaxTimeToMoveInSeconds || playerCurrentMove.IsMoveCompleted)
+            Stack<Card> deckCards = new Stack<Card>();
+            for (int i = 0; i < GameRules.MaxCardsInDeck; i++)
             {
-                //CheckRound();
-
-                if (playerCurrentMove == playerA)
-                {
-                    OnPermissionMakeMove(playerA, false);
-                    AllowMove(playerB);
-                }
-                else
-                {
-                    OnPermissionMakeMove(playerB, false);
-                    AllowMove(playerA);
-                }
+                int index = rand.Next(0, Cards.Count);
+                Card card = Cards.Get(player, index);
+                deckCards.Push(card);
             }
+            decks[player] = deckCards;
         }
 
         private void AllowMove(Player player)
@@ -148,37 +130,101 @@ namespace Assets.Models
             OnChangeMakeMove();
         }
 
-        public void CheckRound()
+        public void RefreshPlayersResults()
         {
-            if (decks[playerA].Count != 0 || decks[playerB].Count != 0) return;
-
-            if (GameBoard.GetTotalGamePoints(playerA) > GameBoard.GetTotalGamePoints(playerB)) playersResults[playerA].AddRoundWin();
-            else if (GameBoard.GetTotalGamePoints(playerA) < GameBoard.GetTotalGamePoints(playerB)) playersResults[playerB].AddRoundWin();
-            CurrentRound += 1;
-            // Вызов события конца раунда (остановка корутины)
-
-            if (playersResults[playerA].RoundsWins != playersResults[playerB].RoundsWins && CurrentRound >= GameRules.MaxRounds)
-            {
-                OnEndGame();
-                return;
-            }
-
-            // Вызов начало следующего раунда (старт корутины)
+            playersResults[playerA].TotalGamePoints = GameBoard.GetTotalGamePoints(playerA);
+            playersResults[playerB].TotalGamePoints = GameBoard.GetTotalGamePoints(playerB);
         }
 
-        public void StartRound()
+        public void CheckStateMakeMove(int timeToMoveInSeconds)
         {
+            RefreshPlayersResults();
+            if (timeToMoveInSeconds > GameRules.MaxTimeToMoveInSeconds || playerCurrentMove.IsMoveCompleted)
+            {
+                Player winPlayerRound = null;
+                if (CheckEndRound(ref winPlayerRound)) 
+                {
+                    Player winPlayerGame = null;
+                    if (CheckEndGame(ref winPlayerGame)) 
+                    {
+                        OnEndGame(winPlayerGame);
+                        return;
+                    }
+                    OnEndRound(winPlayerRound);
+                    StartNewRound();
+                    return;
+                }
+
+                if (playerCurrentMove == playerA)
+                {
+                    OnPermissionMakeMove(playerA, false);
+                    AllowMove(playerB);
+                    OnDealCards(playerA, 1);
+                }
+                else
+                {
+                    OnPermissionMakeMove(playerB, false);
+                    AllowMove(playerA);
+                    OnDealCards(playerB, 1);
+                }
+            }
+        }
+
+        public bool CheckEndRound(ref Player winPlayer)
+        {
+            if (decks[playerA].Count == 0 && decks[playerB].Count == 0) 
+            {
+                if (playersResults[playerA].TotalGamePoints > playersResults[playerB].TotalGamePoints)
+                {
+                    playersResults[playerA].AddRoundWin();
+                    winPlayer = playerA;
+                }
+                else if (playersResults[playerA].TotalGamePoints < playersResults[playerB].TotalGamePoints)
+                {
+                    playersResults[playerB].AddRoundWin();
+                    winPlayer = playerB;
+                }
+                else 
+                {
+                    playersResults[playerA].AddRoundWin();
+                    playersResults[playerB].AddRoundWin();
+                }
+                CurrentRound += 1;
+                return true;
+            }
+            return false;
+        }
+
+        public bool CheckEndGame(ref Player winPlayer) 
+        {
+            if (playersResults[playerA].RoundsWins != playersResults[playerB].RoundsWins && CurrentRound >= GameRules.MaxRounds) 
+            {
+                if (playersResults[playerA].RoundsWins > playersResults[playerB].RoundsWins)
+                    winPlayer = playerA;
+                else
+                    winPlayer = playerB;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public void StartNewRound()
+        {
+            playerA.ClearCardsInHand();
+            playerB.ClearCardsInHand();
+            GameBoard.ClearOpenCards();
+
             GenerateDeck(playerA);
             GenerateDeck(playerB);
 
             OnDealCards(playerA, GameRules.MaxStartPlayerCards);
             OnDealCards(playerB, GameRules.MaxStartPlayerCards);
 
-            // На время тестирования
-            //OnPermissionMakeMove(playerA, true);
-            //OnPermissionMakeMove(playerB, true);
-            
-            AllowMove(playerA);
+            int randNum = rand.Next(1, 3);
+            Player player = randNum == 1 ? playerA : playerB;
+            AllowMove(player);
         }
     }
 }

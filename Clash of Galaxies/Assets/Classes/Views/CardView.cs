@@ -9,7 +9,7 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
 {
     private Camera mainCamera;
     private Vector2 offset;
-    private GameObject tempCard; // Временный шаблон карты, который отображает позицию для вставки карты
+    private static GameObject tempCard; // Временный шаблон карты, который отображает позицию для вставки карты
     public Image Logo;
     public TextMeshProUGUI Name, GamePoints, InfluenceGamePoints;
     public GameObject Shirt;
@@ -20,7 +20,12 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
     {
         // Получение объекта камеры сцены
         mainCamera = Camera.allCameras[0];
-        tempCard = CardViewFactory.GetInstance().GetTempCard();
+        if (tempCard == null) 
+        {
+            var instance = Resources.Load<GameObject>("Prefabs/TempCardPref");
+            tempCard = Instantiate(instance);
+            tempCard.SetActive(true);
+        }
     }
     
     // Start is called before the first frame update

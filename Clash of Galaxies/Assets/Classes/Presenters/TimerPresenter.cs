@@ -18,10 +18,16 @@ namespace Assets.Presenters
             this.game = game;
             this.timerView = timerView;
             this.timerView.CheckStateMakeMoveCallback = CheckStateMakeMove;
-            this.game.ChangeMakeMove += Game_ChangeMakeMove;
+            this.game.ChangedMakeMove += Game_ChangeMakeMove;
+            this.game.EndRound += Game_StoppedRound;
 
-            timerView.StopTimer();
-            timerView.StartTimer();
+            //timerView.StopTimer();
+            //timerView.StartTimer();
+        }
+
+        private void Game_StoppedRound(object sender, EventArgs e)
+        {
+            //timerView.StopTimer();
         }
 
         private void Game_ChangeMakeMove(object sender, EventArgs e)

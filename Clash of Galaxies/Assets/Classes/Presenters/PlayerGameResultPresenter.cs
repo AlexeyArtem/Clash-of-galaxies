@@ -27,6 +27,12 @@ namespace Assets.Presenters
         {
             playerGameResultView.SetRoundsWins(playerGameResult.RoundsWins);
             playerGameResultView.SetTotalGamePoints(playerGameResult.TotalGamePoints);
+            
+            if (e.PropertyName == "RoundsWins") 
+            {
+                // Остановить игру
+                // Вывести экран с информацией о результате раунда
+            }
         }
     }
 }

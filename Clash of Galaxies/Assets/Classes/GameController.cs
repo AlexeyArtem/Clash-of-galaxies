@@ -9,34 +9,36 @@ using System.Collections.ObjectModel;
 public class GameController : MonoBehaviour
 {
     private Game game;
-    private Player playerUser, playerEnemy;
+    private Player playerUser;
+    private PlayerEnemy playerEnemy;
 
     private PlayerPresenter playerUserPresenter, playerEnemyPresenter;
     private GameBoardPresenter gameBoardPresenterUser, gameBoardPresenterEnemy;
     private PlayerGameResultPresenter playerGameResultPresenterUser, playerGameResultPresenterEnemy;
     private TimerPresenter timerPresenter;
+    private PausePanelPresenter pausePanelPresenter;
 
-    public GameObject GameResultUserObj, GameResultEnemyObj, TimerTextObj;
+    public GameObject GameResultUserObj, GameResultEnemyObj, TimerTextObj, PausePanelObj;
 
     private void Awake()
     {
-        playerUser = new Player("First player");
-        playerEnemy = new Player("Second player");
-        game = new Game(playerUser, playerEnemy);
-        game.StartRound();
+        //playerUser = new Player("First player");
+        //playerEnemy = new PlayerEnemy("Second player");
+        //game = new Game(playerUser, playerEnemy);
     }
 
     // Start is called before the first frame update
     void Start()
     {
+        playerUser = new Player("First player");
+        playerEnemy = new PlayerEnemy("Second player");
+        game = new Game(playerUser, playerEnemy);
+
         PlayerView playerView = FindObjectOfType<PlayerView>();
         playerUserPresenter = new PlayerPresenter(playerUser, playerView);
 
-        GameBoardView gameBoardView1 = FindObjectOfType<GameBoardView>();
-        GameBoardPresenter gameBoardPresenter = new GameBoardPresenter(game.GameBoard, gameBoardView1);
-
-        //GameBoardView gameBoardView = GameObject.Find("SelfField").GetComponent<GameBoardView>();
-        //gameBoardPresenterUser = new GameBoardPresenter(game.GameBoard, gameBoardView, playerUserPresenter.CardPresentersInHand);
+        GameBoardView gameBoardView = FindObjectOfType<GameBoardView>();
+        GameBoardPresenter gameBoardPresenter = new GameBoardPresenter(game.GameBoard, gameBoardView);
 
         PlayerEnemyView playerEnemyView = FindObjectOfType<PlayerEnemyView>();
         playerEnemyPresenter = new PlayerPresenter(playerEnemy, playerEnemyView);
@@ -45,15 +47,9 @@ public class GameController : MonoBehaviour
         playerGameResultPresenterEnemy = new PlayerGameResultPresenter(game.PlayersResults[playerEnemy], GameResultEnemyObj.GetComponent<PlayerGameResultView>());
 
         timerPresenter = new TimerPresenter(game, TimerTextObj.GetComponent<TimerView>());
+        pausePanelPresenter = new PausePanelPresenter(game, PausePanelObj.GetComponent<PausePanelView>());
 
-        //GameBoardView gameBoardEnemyView = GameObject.Find("EnemyField").GetComponent<GameBoardView>();
-        //gameBoardPresenterEnemy = new GameBoardPresenter(game.GameBoard, gameBoardEnemyView, playerEnemyPresenter.CardPresentersInHand);
-
-        // Для теста
-        //playerEnemy.OnMakeMove(playerEnemy.CardsInHand[0]);
-        //playerEnemy.OnMakeMove(playerEnemy.CardsInHand[0]);
-        //playerUser.OnMakeMove(playerUser.CardsInHand[0]);
-        //game.RefreshPlayersResults();
+        game.StartNewRound();
     }
 
     // Update is called once per frame
