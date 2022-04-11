@@ -28,6 +28,7 @@ namespace Assets.Models
         public event EventHandler Destroy;
         public event PropertyChangedEventHandler PropertyChanged;
 
+        public Behaviour Behaviour { get => behaviour; }
         public string Name { get; }
         public string Description { get; }
         public int InfluenceGamePoints

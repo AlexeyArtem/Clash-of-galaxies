@@ -14,11 +14,6 @@ namespace Assets.Models
 
         protected Behaviour(Player owner, IReadOnlyDictionary<Player, List<Card>> openCards)
         {
-            //if (!openCards.ContainsKey(owner)) 
-            //{
-            //    throw new ArgumentException("The owner of the behavior is not contained in the dictionary of open cards");
-            //}
-
             this.owner = owner;
             this.openCards = openCards;
         }
@@ -48,7 +43,7 @@ namespace Assets.Models
 
         private void OnEndBehaviour()
         {
-            BeginBehaviour?.Invoke(this, new EventArgs());
+            EndBehaviour?.Invoke(this, new EventArgs());
         }
 
         public abstract void Activate(Card card);

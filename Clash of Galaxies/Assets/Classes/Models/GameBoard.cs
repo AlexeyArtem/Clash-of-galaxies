@@ -26,7 +26,6 @@ namespace Assets.Models
             playerB.MakeMove += ToProcessMove;
         }
 
-        // For testing
         public event MakeMoveEventHandler NewOpenCard;
 
         public Player PlayerA { get; }

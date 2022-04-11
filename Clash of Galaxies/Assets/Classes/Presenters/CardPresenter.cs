@@ -21,13 +21,35 @@ namespace Assets.Presenters
             cardView.SetCardInfo(card.Name, card.Description, card.GamePoints, card.InfluenceGamePoints);
             card.PropertyChanged += Card_PropertyChanged;
             card.Destroy += Card_Destroy;
+
+            if (card.Behaviour != null) 
+            {
+                card.Behaviour.BeginBehaviour += Behaviour_BeginBehaviour;
+                card.Behaviour.EndBehaviour += Behaviour_EndBehaviour;
+            }
+        }
+
+        private void Behaviour_EndBehaviour(object sender, EventArgs e)
+        {
+            cardView.DeactivateTargetArrow();
+        }
+
+        private void Behaviour_BeginBehaviour(object sender, EventArgs e)
+        {
+            cardView.ActivateTargetArrow();
         }
 
         private void Card_Destroy(object sender, EventArgs e)
         {
+            cardView.DeactivateTargetArrow();
             cardView.DestroyView();
             card.PropertyChanged -= Card_PropertyChanged;
             card.Destroy -= Card_Destroy;
+            if (card.Behaviour != null)
+            {
+                card.Behaviour.BeginBehaviour -= Behaviour_BeginBehaviour;
+                card.Behaviour.EndBehaviour -= Behaviour_EndBehaviour;
+            }
             card = null;
             cardView = null;
         }

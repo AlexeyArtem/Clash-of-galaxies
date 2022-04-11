@@ -9,10 +9,11 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
 {
     private Camera mainCamera;
     private Vector2 offset;
-    private static GameObject tempCard; // ¬ременный шаблон карты, который отображает позицию дл€ вставки карты
+    private static GameObject tempCardObj; // ¬ременный шаблон карты, который отображает позицию дл€ вставки карты
+    private static Arrow arrowScr;
     public Image Logo;
     public TextMeshProUGUI Name, GamePoints, InfluenceGamePoints;
-    public GameObject Shirt;
+    public GameObject ShirtObj;
     public Transform DefaultTempCardParent { get; set; }
     public Transform DefaultParent { get; set; }
 
@@ -20,11 +21,18 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
     {
         // ѕолучение объекта камеры сцены
         mainCamera = Camera.allCameras[0];
-        if (tempCard == null) 
+        if (tempCardObj == null) 
         {
             var instance = Resources.Load<GameObject>("Prefabs/TempCardPref");
-            tempCard = Instantiate(instance);
-            tempCard.SetActive(true);
+            tempCardObj = Instantiate(instance);
+            tempCardObj.SetActive(true);
+        }
+        if (arrowScr == null) 
+        {
+            var instance = Resources.Load<GameObject>("Prefabs/ArrowPref");
+            var obj = Instantiate(instance);
+            obj.transform.SetParent(GameObject.Find("BG").transform, false);
+            arrowScr = obj.GetComponent<Arrow>();
         }
     }
     
@@ -50,13 +58,13 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
             {
                 newIndex = i;
 
-                if (tempCard.transform.GetSiblingIndex() < newIndex)
+                if (tempCardObj.transform.GetSiblingIndex() < newIndex)
                     newIndex--;
 
                 break;
             }
         }
-        tempCard.transform.SetSiblingIndex(newIndex);
+        tempCardObj.transform.SetSiblingIndex(newIndex);
     }
 
     public void SetCardInfo(string name, string description, int gamePoints, int influenceGamePoints)
@@ -70,15 +78,15 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
     {
         if (transform.parent.name == "EnemyHand" || transform.parent.name == "EnemyField") return; // Ќельз€ перетаскивать карту, котора€ находитс€ у противника
 
-        tempCard.SetActive(true);
+        tempCardObj.SetActive(true);
 
         offset = transform.position - mainCamera.ScreenToWorldPoint(eventData.position);
 
         // ѕеремещение элемента вверх по иерархии игровых объектов
         DefaultParent = DefaultTempCardParent = transform.parent;
 
-        tempCard.transform.SetParent(DefaultParent, false); //¬ качестве родител€ дл€ временной карты выступает родитель текущей карта, т.е. Hand
-        tempCard.transform.SetSiblingIndex(transform.GetSiblingIndex());
+        tempCardObj.transform.SetParent(DefaultParent, false); //¬ качестве родител€ дл€ временной карты выступает родитель текущей карта, т.е. Hand
+        tempCardObj.transform.SetSiblingIndex(transform.GetSiblingIndex());
 
         transform.SetParent(DefaultParent.parent.parent); //”становка дл€ карты родител€ в качестве BG (background)
 
@@ -93,8 +101,8 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
         Vector2 newPos = mainCamera.ScreenToWorldPoint(eventData.position);
         transform.position = newPos + offset;
 
-        if (tempCard.transform.parent != DefaultTempCardParent)
-            tempCard.transform.SetParent(DefaultTempCardParent);
+        if (tempCardObj.transform.parent != DefaultTempCardParent)
+            tempCardObj.transform.SetParent(DefaultTempCardParent);
 
         RecalculatePosition();
     }
@@ -109,15 +117,15 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
         GetComponent<CanvasGroup>().blocksRaycasts = true;
 
         // ”становка индекса временной карты текущей карте
-        transform.SetSiblingIndex(tempCard.transform.GetSiblingIndex());
+        transform.SetSiblingIndex(tempCardObj.transform.GetSiblingIndex());
 
         // ”брать временную карту с игрового пол€, когда перетаскивание завершено
-        tempCard.SetActive(false);
+        tempCardObj.SetActive(false);
     }
 
     public void SetActiveCardShirt(bool isActive)
     {
-        Shirt.SetActive(isActive);
+        ShirtObj.SetActive(isActive);
     }
 
     public void OnPointerClick(PointerEventData eventData)
@@ -137,5 +145,21 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
     public void DestroyView() 
     {
         Destroy(gameObject);
+    }
+
+    public void ActivateTargetArrow()
+    {
+        if (transform.parent.name == "SelfField")
+        {
+            arrowScr.SetupAndActivate(transform);
+        }
+    }
+
+    public void DeactivateTargetArrow()
+    {
+        if (transform.parent.name == "SelfField")
+        {
+            arrowScr.Deactivate();
+        }
     }
 }

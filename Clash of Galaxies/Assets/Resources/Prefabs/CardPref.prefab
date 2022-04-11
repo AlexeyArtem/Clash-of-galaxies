@@ -576,7 +576,7 @@ MonoBehaviour:
   Name: {fileID: 2568943912994803246}
   GamePoints: {fileID: 362961514878837789}
   InfluenceGamePoints: {fileID: 6770679543514053976}
-  Shirt: {fileID: 6167165715325987150}
+  ShirtObj: {fileID: 6167165715325987150}
 --- !u!225 &4748771384922376592
 CanvasGroup:
   m_ObjectHideFlags: 0
