@@ -19,6 +19,7 @@ namespace Assets.Presenters
             this.card = card;
             this.cardView = cardView;
             cardView.SetCardInfo(card.Name, card.Description, card.GamePoints, card.InfluenceGamePoints);
+            cardView.SetImage(card.NameImg);
             card.PropertyChanged += Card_PropertyChanged;
             card.Destroy += Card_Destroy;
 

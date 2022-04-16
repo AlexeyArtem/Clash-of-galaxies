@@ -5,15 +5,16 @@ using TMPro;
 using UnityEngine.EventSystems;
 using Assets.Views;
 
-public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerClickHandler
+public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
     private Camera mainCamera;
     private Vector2 offset;
     private static GameObject tempCardObj; // Временный шаблон карты, который отображает позицию для вставки карты
-    private static Arrow arrowScr;
-    public Image Logo;
+    private static Arrow greenArrowScr;
+    public Image CardImage;
     public TextMeshProUGUI Name, GamePoints, InfluenceGamePoints;
-    public GameObject ShirtObj;
+    public GameObject ShirtObj, FrameObj;
+    public Animation AnimationCard;
     public Transform DefaultTempCardParent { get; set; }
     public Transform DefaultParent { get; set; }
 
@@ -27,25 +28,13 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
             tempCardObj = Instantiate(instance);
             tempCardObj.SetActive(true);
         }
-        if (arrowScr == null) 
+        if (greenArrowScr == null) 
         {
             var instance = Resources.Load<GameObject>("Prefabs/ArrowPref");
             var obj = Instantiate(instance);
             obj.transform.SetParent(GameObject.Find("BG").transform, false);
-            arrowScr = obj.GetComponent<Arrow>();
+            greenArrowScr = obj.GetComponent<Arrow>();
         }
-    }
-    
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
     }
 
     // Проверка позиции текущей карты относительно других и перемещение карты в зависимости от позиции карт, находящихся рядом
@@ -72,6 +61,14 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
         Name.text = name;
         GamePoints.text = gamePoints.ToString();
         InfluenceGamePoints.text = influenceGamePoints.ToString();
+    }
+
+    public void SetImage(string nameImg) 
+    {
+        Image imgCard = GetComponent<Image>();
+        string path = "Sprites/Cards/" + nameImg;
+        Sprite spriteCard = Resources.Load<Sprite>(path);
+        imgCard.sprite = spriteCard;
     }
 
     public void OnBeginDrag(PointerEventData eventData)
@@ -144,6 +141,11 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
 
     public void DestroyView() 
     {
+        AnimationCard.Play("destroyCard");
+    }
+
+    public void DestroyGameObject() 
+    {
         Destroy(gameObject);
     }
 
@@ -151,7 +153,7 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
     {
         if (transform.parent.name == "SelfField")
         {
-            arrowScr.SetupAndActivate(transform);
+            greenArrowScr.SetupAndActivate(transform);
         }
     }
 
@@ -159,7 +161,17 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
     {
         if (transform.parent.name == "SelfField")
         {
-            arrowScr.Deactivate();
+            greenArrowScr.Deactivate();
         }
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        FrameObj.SetActive(true);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        FrameObj.SetActive(false);
     }
 }

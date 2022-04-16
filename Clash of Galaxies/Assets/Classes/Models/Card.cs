@@ -20,7 +20,17 @@ namespace Assets.Models
             Description = description;
         }
 
+        public Card(string name, int gamePoints, string description, string nameImg) : this (name, gamePoints, description)
+        {
+            NameImg = nameImg;
+        }
+
         public Card(string name, int gamePoints, string description, Behaviour behaviour) : this(name, gamePoints, description)
+        {
+            this.behaviour = behaviour;
+        }
+
+        public Card(string name, int gamePoints, string description, string nameImg, Behaviour behaviour) : this(name, gamePoints, description, nameImg)
         {
             this.behaviour = behaviour;
         }
@@ -31,6 +41,7 @@ namespace Assets.Models
         public Behaviour Behaviour { get => behaviour; }
         public string Name { get; }
         public string Description { get; }
+        public string NameImg { get; }
         public int InfluenceGamePoints
         {
             get
@@ -77,7 +88,7 @@ namespace Assets.Models
 
         public Card Clone()
         {
-            return new Card(Name, GamePoints, Description, behaviour);
+            return new Card(Name, GamePoints, Description, NameImg, behaviour);
         }
 
         public void InfluenceOnCard(Card targetCard)
