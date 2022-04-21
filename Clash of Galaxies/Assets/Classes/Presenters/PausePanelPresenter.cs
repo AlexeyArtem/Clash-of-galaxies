@@ -21,7 +21,7 @@ namespace Assets.Presenters
             this.game.EndGame += Game_EndGame;
         }
 
-        private void Game_EndGame(object sender, EndRoundEventArgs e)
+        private void Game_EndGame(object sender, EndEventArgs e)
         {
             bool isPlayerUserWin = true;
             
@@ -31,7 +31,7 @@ namespace Assets.Presenters
             pausePanelView.ShowResultGame(isPlayerUserWin);
         }
 
-        private void Game_EndRound(object sender, EndRoundEventArgs e)
+        private void Game_EndRound(object sender, EndEventArgs e)
         {
             bool isPlayerUserWin = true;
 

@@ -1,9 +1,13 @@
-using Assets.Models;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
 using Assets.Views;
+using DG.Tweening;
+using System.Threading.Tasks;
+using System.Threading;
+using System;
+
 
 public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
@@ -11,16 +15,25 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
     private Vector2 offset;
     private static GameObject tempCardObj; // Временный шаблон карты, который отображает позицию для вставки карты
     private static Arrow greenArrowScr;
+    private Animator attackPointsAnimator, strengtheningPointsAnimator;
+    private Animator cardAnimator;
+
     public Image CardImage;
-    public TextMeshProUGUI Name, GamePoints, InfluenceGamePoints;
+    public TextMeshProUGUI Name, GamePoints, InfluenceGamePoints, AttackPoints, StrengtheningPoints;
     public GameObject ShirtObj, FrameObj;
     public Animation AnimationCard;
+
     public Transform DefaultTempCardParent { get; set; }
     public Transform DefaultParent { get; set; }
 
     void Awake() 
     {
-        // Получение объекта камеры сцены
+        AttackPoints.text = "";
+        StrengtheningPoints.text = "";
+        attackPointsAnimator = AttackPoints.GetComponent<Animator>();
+        strengtheningPointsAnimator = StrengtheningPoints.GetComponent<Animator>();
+        cardAnimator = GetComponent<Animator>();
+
         mainCamera = Camera.allCameras[0];
         if (tempCardObj == null) 
         {
@@ -38,7 +51,7 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
     }
 
     // Проверка позиции текущей карты относительно других и перемещение карты в зависимости от позиции карт, находящихся рядом
-    private void RecalculatePosition()
+    private void RecalculatePositionTempCard()
     {
         int newIndex = DefaultTempCardParent.childCount;
         for (int i = 0; i < DefaultTempCardParent.childCount; i++)
@@ -54,6 +67,18 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
             }
         }
         tempCardObj.transform.SetSiblingIndex(newIndex);
+    }
+
+    public void MoveToFieldAnimate(Transform parent, Vector2 position, float time = .8f) 
+    {
+        Sequence sequence = DOTween.Sequence();
+
+        sequence.Append(transform.DOMove(position, time))
+        .OnComplete(() => {
+            transform.SetParent(parent);
+        });
+
+        sequence.Play();
     }
 
     public void SetCardInfo(string name, string description, int gamePoints, int influenceGamePoints)
@@ -101,15 +126,19 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
         if (tempCardObj.transform.parent != DefaultTempCardParent)
             tempCardObj.transform.SetParent(DefaultTempCardParent);
 
-        RecalculatePosition();
+        RecalculatePositionTempCard();
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
         if (transform.parent.name == "EnemyHand" || transform.parent.name == "EnemyField") return;
 
-        if (DefaultParent != null)
-            transform.SetParent(DefaultParent);
+        if (DefaultParent != null) 
+        {
+            int index = tempCardObj.transform.GetSiblingIndex();
+            Vector2 position = DefaultParent.GetChild(index).position;
+            MoveToFieldAnimate(DefaultParent, position, .4f);
+        }
 
         GetComponent<CanvasGroup>().blocksRaycasts = true;
 
@@ -136,12 +165,26 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
 
     public void ChangeGamePoints(int gamePoints)
     {
+        int difference = gamePoints - Convert.ToInt32(GamePoints.text.ToString());
         GamePoints.text = gamePoints.ToString();
+        if (difference < 0)
+        {
+            AttackPoints.text = difference.ToString();
+            attackPointsAnimator.SetTrigger("OnFlyUp");
+            cardAnimator.SetTrigger("OnRedBlink");
+        }
+        else if (difference > 0)
+        {
+            StrengtheningPoints.text = "+" + difference.ToString();
+            strengtheningPointsAnimator.SetTrigger("OnFlyUp");
+            cardAnimator.SetTrigger("OnBlueBlink");
+        }
     }
 
     public void DestroyView() 
     {
-        AnimationCard.Play("destroyCard");
+        //AnimationCard.Play("destroyCard");
+        cardAnimator.SetTrigger("OnMissing");
     }
 
     public void DestroyGameObject() 

@@ -48,9 +48,17 @@ namespace Assets.Presenters
             List<ICardView> cardViews = new List<ICardView>();
             foreach (var card in cards)
             {
-                ICardView cardView = CardViewFactory.GetInstance().GetNewView();
-                CardPresenterFactory.GetInstance().CreateNewPresenter(card, cardView);
-                cardViews.Add(cardView);
+                var presenter = CardPresenterFactory.GetInstance().FindPresenter(card);
+
+                if (presenter != null)
+                    cardViews.Add(presenter.CardView);
+                else 
+                {
+                    var view = CardViewFactory.GetInstance().GetNewView();
+                    CardPresenterFactory.GetInstance().CreateNewPresenter(card, view);
+                    cardViews.Add(view);
+                }
+                    
             }
             return cardViews;
         }

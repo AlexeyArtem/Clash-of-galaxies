@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Assets.Models
 {
-    public delegate void EndRoundEventHandler(object sender, EndRoundEventArgs args);
+    public delegate void EndEventHandler(object sender, EndEventArgs args);
     
-    public class EndRoundEventArgs : EventArgs
+    public class EndEventArgs : EventArgs
     {
-        public EndRoundEventArgs(Player winPlayer) 
+        public EndEventArgs(Player winPlayer) 
         {
             WinPlayer = winPlayer;
         }

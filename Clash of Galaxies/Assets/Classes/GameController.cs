@@ -17,18 +17,11 @@ public class GameController : MonoBehaviour
     private PlayerGameResultPresenter playerGameResultPresenterUser, playerGameResultPresenterEnemy;
     private TimerPresenter timerPresenter;
     private PausePanelPresenter pausePanelPresenter;
+    private DeckCardsPresenter deckPresenterUser, deckPresenterEnemy;
 
-    public GameObject GameResultUserObj, GameResultEnemyObj, TimerTextObj, PausePanelObj;
+    public GameObject GameResultUserObj, GameResultEnemyObj, TimerTextObj, PausePanelObj, DeckUserObj, DeckEnemyObj;
 
-    private void Awake()
-    {
-        //playerUser = new Player("First player");
-        //playerEnemy = new PlayerEnemy("Second player");
-        //game = new Game(playerUser, playerEnemy);
-    }
-
-    // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         playerUser = new Player("First player");
         playerEnemy = new PlayerEnemy("Second player");
@@ -43,18 +36,15 @@ public class GameController : MonoBehaviour
         PlayerEnemyView playerEnemyView = FindObjectOfType<PlayerEnemyView>();
         playerEnemyPresenter = new PlayerPresenter(playerEnemy, playerEnemyView);
 
-        playerGameResultPresenterUser = new PlayerGameResultPresenter(game.PlayersResults[playerUser], GameResultUserObj.GetComponent<PlayerGameResultView>());
-        playerGameResultPresenterEnemy = new PlayerGameResultPresenter(game.PlayersResults[playerEnemy], GameResultEnemyObj.GetComponent<PlayerGameResultView>());
+        playerGameResultPresenterUser = new PlayerGameResultPresenter(game.PlayersResults[playerUser], playerView.GetComponentInChildren<PlayerGameResultView>());
+        playerGameResultPresenterEnemy = new PlayerGameResultPresenter(game.PlayersResults[playerEnemy], playerEnemyView.GetComponentInChildren<PlayerGameResultView>());
 
         timerPresenter = new TimerPresenter(game, TimerTextObj.GetComponent<TimerView>());
         pausePanelPresenter = new PausePanelPresenter(game, PausePanelObj.GetComponent<PausePanelView>());
 
-        game.StartNewRound();
-    }
+        deckPresenterUser = new DeckCardsPresenter(game.Decks[playerUser], DeckUserObj.GetComponent<DeckCardsView>());
+        deckPresenterEnemy = new DeckCardsPresenter(game.Decks[playerEnemy], DeckEnemyObj.GetComponent<DeckCardsView>());
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        game.StartNewRound();
     }
 }

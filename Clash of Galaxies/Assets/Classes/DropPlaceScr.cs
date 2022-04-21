@@ -8,16 +8,9 @@ public class DropPlaceScr : MonoBehaviour, IDropHandler, IPointerEnterHandler, I
 {
     private PlayerView playerView;
 
-    // Start is called before the first frame update
     void Start()
     {
         playerView = FindObjectOfType<PlayerView>();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     // Привидение мыши к границам объекта

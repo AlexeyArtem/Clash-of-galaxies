@@ -20,7 +20,8 @@ public class GameBoardView : MonoBehaviour, IGameBoardView
         
     }
 
-    public void SetCardView(ICardView cardView) 
+    // Удалить метод
+    public void SetCardView(ICardView cardView)
     {
         CardView objectCardView = cardView as CardView;
         objectCardView.transform.SetParent(transform);
@@ -31,16 +32,28 @@ public class GameBoardView : MonoBehaviour, IGameBoardView
     public void SetCardViewPlayerA(ICardView cardView) 
     {
         CardView objectCardView = cardView as CardView;
+        objectCardView.SetActiveCardShirt(false);
         objectCardView.transform.SetParent(selfField.transform);
         objectCardView.DefaultParent = selfField.transform;
-        objectCardView.SetActiveCardShirt(false);
     }
 
     public void SetCardViewPlayerB(ICardView cardView)
     {
         CardView objectCardView = cardView as CardView;
-        objectCardView.transform.SetParent(enemyField.transform);
-        objectCardView.DefaultParent = enemyField.transform;
         objectCardView.SetActiveCardShirt(false);
+        
+        Vector3 newPosition = enemyField.transform.position;
+        var childCount = enemyField.transform.childCount;
+        if (childCount > 1)
+        {
+            Transform lastChild = enemyField.transform.GetChild(enemyField.transform.childCount - 1);
+            Transform preLastChild = enemyField.transform.GetChild(enemyField.transform.childCount - 2);
+
+            newPosition = lastChild.position;
+            float offset = lastChild.position.x - preLastChild.position.x;
+            newPosition.x += offset;
+        }
+
+        objectCardView.MoveToFieldAnimate(enemyField.transform, newPosition);
     }
 }
