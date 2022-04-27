@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+  <columns>
+    <IsAttacking index="3">IsAttacking</IsAttacking>
+    <IsMassTarget index="2">IsMassTarget</IsMassTarget>
+    <Name index="1">Name</Name>
+  </columns>
+  <records>
+    <record index="1">
+      <IsAttacking>false</IsAttacking>
+      <IsMassTarget>false</IsMassTarget>
+      <Name>Planet</Name>
+    </record>
+    <record index="2">
+      <IsAttacking>false</IsAttacking>
+      <IsMassTarget>false</IsMassTarget>
+      <Name>Star</Name>
+    </record>
+    <record index="3">
+      <IsAttacking>true</IsAttacking>
+      <IsMassTarget>false</IsMassTarget>
+      <Name>Asteroid</Name>
+    </record>
+    <record index="4">
+      <IsAttacking>true</IsAttacking>
+      <IsMassTarget>true</IsMassTarget>
+      <Name>Meteorite</Name>
+    </record>
+    <record index="5">
+      <IsAttacking>true</IsAttacking>
+      <IsMassTarget>false</IsMassTarget>
+      <Name>Black Hole</Name>
+    </record>
+    <record index="6">
+      <IsAttacking>false</IsAttacking>
+      <IsMassTarget>false</IsMassTarget>
+      <Name>Satellite</Name>
+    </record>
+    <record index="7">
+      <IsAttacking>false</IsAttacking>
+      <IsMassTarget>false</IsMassTarget>
+      <Name>Comet</Name>
+    </record>
+    <record index="8">
+      <IsAttacking>false</IsAttacking>
+      <IsMassTarget>true</IsMassTarget>
+      <Name>Inter Cloud</Name>
+    </record>
+  </records>
+</data>

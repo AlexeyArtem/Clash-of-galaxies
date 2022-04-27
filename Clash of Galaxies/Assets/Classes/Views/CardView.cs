@@ -50,6 +50,11 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
         }
     }
 
+    void Update() 
+    {
+
+    }
+
     // Проверка позиции текущей карты относительно других и перемещение карты в зависимости от позиции карт, находящихся рядом
     private void RecalculatePositionTempCard()
     {
@@ -86,6 +91,10 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
         Name.text = name;
         GamePoints.text = gamePoints.ToString();
         InfluenceGamePoints.text = influenceGamePoints.ToString();
+        if (influenceGamePoints < 0) 
+        {
+            InfluenceGamePoints.color = Color.red;
+        }
     }
 
     public void SetImage(string nameImg) 

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Assets.Views
 {
-    interface IPausePanelView
+    interface IResultView
     {
         void ShowResultRound(bool isPlayerUserWin, int winRoundNumber);
         void ShowResultGame(bool isPlayerUserWin);

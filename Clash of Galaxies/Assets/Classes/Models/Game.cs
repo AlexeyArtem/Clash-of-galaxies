@@ -74,7 +74,7 @@ namespace Assets.Models
 
         private void OnPermissionMakeMove(Player player, bool isPermissionMakeMove)
         {
-            var args = new PermissionMakeMoveEventArgs(player, isPermissionMakeMove);
+            var args = new PermissionMakeMoveEventArgs(player, isPermissionMakeMove, GameBoard.OpenCards);
             PermissionMakeMove?.Invoke(this, args);
         }
 
@@ -107,6 +107,10 @@ namespace Assets.Models
             OnPermissionMakeMove(playerB, false);
             // Вызов события окончания игры
             EndGame?.Invoke(this, new EndEventArgs(winPLayer));
+
+            playerA.ClearCardsInHand();
+            playerB.ClearCardsInHand();
+            GameBoard.ClearOpenCards();
 
             // Отписка от всех событий
             PermissionMakeMove = null;

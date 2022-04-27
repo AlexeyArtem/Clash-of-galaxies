@@ -8,12 +8,12 @@ using Assets.Views;
 
 namespace Assets.Presenters
 {
-    class PausePanelPresenter
+    class ResultPresenter
     {
         private Game game;
-        private IPausePanelView pausePanelView;
+        private IResultView pausePanelView;
 
-        public PausePanelPresenter(Game game, IPausePanelView pausePanelView)
+        public ResultPresenter(Game game, IResultView pausePanelView)
         {
             this.game = game;
             this.pausePanelView = pausePanelView;

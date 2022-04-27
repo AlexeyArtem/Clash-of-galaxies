@@ -5,14 +5,14 @@ using Assets.Views;
 using TMPro;
 using UnityEngine.SceneManagement;
 
-public class PausePanelView : MonoBehaviour, IPausePanelView
+public class ResultPanelView : MonoBehaviour, IResultView
 {
     private float time = 10;
     private bool isEndRound = false;
 
     public TextMeshProUGUI GameResultText;
     public TextMeshProUGUI RoundResultText;
-    public GameObject PausePanel, EndGameWindow, EndRoundWindow;
+    public GameObject EndGameWindow, EndRoundWindow;
 
     // Start is called before the first frame update
     void Start()
@@ -27,10 +27,10 @@ public class PausePanelView : MonoBehaviour, IPausePanelView
         {
             time -= Time.fixedDeltaTime;
         }
-        if(time <= 0)
+        if (time <= 0)
         {
             Time.timeScale = 1.0f;
-            PausePanel.SetActive(false);
+            gameObject.SetActive(false);
             isEndRound = false;
             time = 5;
         }
@@ -46,7 +46,7 @@ public class PausePanelView : MonoBehaviour, IPausePanelView
             text = "К сожалению, Вы проиграли!";
 
         GameResultText.text = text;
-        PausePanel.SetActive(true);
+        gameObject.SetActive(true);
         EndGameWindow.SetActive(true);
         Time.timeScale = 0;
     }
@@ -61,7 +61,7 @@ public class PausePanelView : MonoBehaviour, IPausePanelView
             text = "К сожалению, Вы проиграли в " + roundNumber + " раунде!"; ;
 
         RoundResultText.text = text;
-        PausePanel.SetActive(true);
+        gameObject.SetActive(true);
         isEndRound = true;
         Time.timeScale = 0;
     }

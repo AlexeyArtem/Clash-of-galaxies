@@ -19,7 +19,7 @@ namespace Assets.Models
                 {
                     new Card("Asteroid", 3, "Нанесение 2 ед. урона карте противника. Полностью уничтожает выбранную карту, если она Asteroid.",
                               "asteroidTemp", new AsteroidBehaviour(player, openCards)),
-                    new Card("Inter cloud", 1, "Усиливает на 1 ед. все дружественные карты.",
+                    new Card("Inter Cloud", 1, "Усиливает на 1 ед. все дружественные карты.",
                               "interCloudTemp", new InterCloudBehaviour(player, openCards)),
                     new Card("Satellite", 2, "Усиливает выбранную карту на 1 ед. Если выбрана карта Planet, то усиливает её на 2 ед.",
                               "satelliteTemp", new SatelliteBehaviour(player, openCards)),

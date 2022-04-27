@@ -16,15 +16,15 @@ public class GameController : MonoBehaviour
     private GameBoardPresenter gameBoardPresenterUser, gameBoardPresenterEnemy;
     private PlayerGameResultPresenter playerGameResultPresenterUser, playerGameResultPresenterEnemy;
     private TimerPresenter timerPresenter;
-    private PausePanelPresenter pausePanelPresenter;
+    private ResultPresenter resultPresenter;
     private DeckCardsPresenter deckPresenterUser, deckPresenterEnemy;
 
-    public GameObject GameResultUserObj, GameResultEnemyObj, TimerTextObj, PausePanelObj, DeckUserObj, DeckEnemyObj;
+    public GameObject TimerTextObj, ResultPanelObj, DeckUserObj, DeckEnemyObj;
 
     void Awake()
     {
         playerUser = new Player("First player");
-        playerEnemy = new PlayerEnemy("Second player");
+        playerEnemy = new PlayerEnemy("Second player", "Assets/Resources/cards info.xml");
         game = new Game(playerUser, playerEnemy);
 
         PlayerView playerView = FindObjectOfType<PlayerView>();
@@ -40,7 +40,7 @@ public class GameController : MonoBehaviour
         playerGameResultPresenterEnemy = new PlayerGameResultPresenter(game.PlayersResults[playerEnemy], playerEnemyView.GetComponentInChildren<PlayerGameResultView>());
 
         timerPresenter = new TimerPresenter(game, TimerTextObj.GetComponent<TimerView>());
-        pausePanelPresenter = new PausePanelPresenter(game, PausePanelObj.GetComponent<PausePanelView>());
+        resultPresenter = new ResultPresenter(game, ResultPanelObj.GetComponent<ResultPanelView>());
 
         deckPresenterUser = new DeckCardsPresenter(game.Decks[playerUser], DeckUserObj.GetComponent<DeckCardsView>());
         deckPresenterEnemy = new DeckCardsPresenter(game.Decks[playerEnemy], DeckEnemyObj.GetComponent<DeckCardsView>());
