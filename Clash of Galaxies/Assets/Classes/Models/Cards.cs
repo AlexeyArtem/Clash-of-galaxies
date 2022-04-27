@@ -27,10 +27,10 @@ namespace Assets.Models
                               "blackHoleTemp", new BlackHoleBehaviour(player, openCards)),
                     new Card("Meteorite", 3, "Нанесение 1 ед. урона каждой карте противника.",
                               "meteoriteTemp", new MeteoriteBehaviour(player, openCards)),
-                    new Card("Comet", 2, "Усиливает, выбранную карту на 2 ед. Если выбрана звезда, то усиливает её на 4 ед.",
+                    new Card("Comet", 2, "Усиливает, выбранную карту на 2 ед. Если выбрана карта Star, то усиливает её на 4 ед.",
                               "cometTemp", new CometBehaviour(player, openCards)),
-                    new Card("Planet", 5, "Статичная карта планеты.", "planetTemp"),
-                    new Card("Star", 10, "Статичная карта звезды.", "starTemp"),
+                    new Card("Planet", 5, "Статичная карта Planet.", "planetTemp"),
+                    new Card("Star", 10, "Статичная карта Start.", "starTemp"),
 
                 };
                 Count = cards.Count;

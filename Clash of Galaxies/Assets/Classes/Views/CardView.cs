@@ -19,8 +19,8 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
     private Animator cardAnimator;
 
     public Image CardImage;
-    public TextMeshProUGUI Name, GamePoints, InfluenceGamePoints, AttackPoints, StrengtheningPoints;
-    public GameObject ShirtObj, FrameObj;
+    public TextMeshProUGUI Name, Description, GamePoints, InfluenceGamePoints, AttackPoints, StrengtheningPoints;
+    public GameObject ShirtObj, FrameObj, TooltipObj;
     public Animation AnimationCard;
 
     public Transform DefaultTempCardParent { get; set; }
@@ -90,6 +90,7 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
     {
         Name.text = name;
         GamePoints.text = gamePoints.ToString();
+        Description.text = description;
         InfluenceGamePoints.text = influenceGamePoints.ToString();
         if (influenceGamePoints < 0) 
         {
@@ -109,6 +110,7 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
     {
         if (transform.parent.name == "EnemyHand" || transform.parent.name == "EnemyField") return; // Нельзя перетаскивать карту, которая находится у противника
 
+        TooltipObj.SetActive(false);
         tempCardObj.SetActive(true);
 
         offset = transform.position - mainCamera.ScreenToWorldPoint(eventData.position);
@@ -219,11 +221,19 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
 
     public void OnPointerEnter(PointerEventData eventData)
     {
+        if (transform.parent.name == "SelfHand") 
+        {
+            TooltipObj.SetActive(true);
+        }
         FrameObj.SetActive(true);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
+        if (transform.parent.name == "SelfHand")
+        {
+            TooltipObj.SetActive(false);
+        }
         FrameObj.SetActive(false);
     }
 }
