@@ -4,28 +4,22 @@ using UnityEngine;
 using Assets.Views;
 using TMPro;
 using UnityEngine.SceneManagement;
+using System;
 
 public class ResultPanelView : MonoBehaviour, IResultView
 {
-    private float time = 10;
+    private float time = 20;
     private bool isEndRound = false;
 
-    public TextMeshProUGUI GameResultText;
-    public TextMeshProUGUI RoundResultText;
+    public TextMeshProUGUI GameResultText, RoundResultText, TimeToNextRoundText;
     public GameObject EndGameWindow, EndRoundWindow;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
     void Update()
     {
         if (isEndRound && time > 0)
         {
             time -= Time.fixedDeltaTime;
+            TimeToNextRoundText.text = Math.Round(time).ToString();
         }
         if (time <= 0)
         {
@@ -46,15 +40,19 @@ public class ResultPanelView : MonoBehaviour, IResultView
             text = "К сожалению, Вы проиграли!";
 
         GameResultText.text = text;
+        EndRoundWindow.SetActive(false);
         gameObject.SetActive(true);
         EndGameWindow.SetActive(true);
+
+        Animator animator = EndGameWindow.GetComponent<Animator>();
+        animator.Play("ScaledDisplaying");
+
         Time.timeScale = 0;
     }
 
     public void ShowResultRound(bool isPlayerUserWin, int roundNumber)
     {
         string text;
-
         if (isPlayerUserWin)
             text = "Поздравляем! Вы победили в " + roundNumber + " раунде!";
         else
@@ -62,13 +60,18 @@ public class ResultPanelView : MonoBehaviour, IResultView
 
         RoundResultText.text = text;
         gameObject.SetActive(true);
+        EndRoundWindow.SetActive(true);
+
+        Animator animator = EndRoundWindow.GetComponent<Animator>();
+        animator.Play("ScaledDisplaying");
+
         isEndRound = true;
-        Time.timeScale = 0;
+        Time.timeScale = 0f;
     }
 
     public void MainMenuClick() 
     {
-        Time.timeScale = 1;
+        Time.timeScale = 1f;
         SceneManager.LoadScene("MenuScene");
     }
 }

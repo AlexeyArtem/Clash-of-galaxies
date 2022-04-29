@@ -12,5 +12,6 @@ namespace Assets.Views
         Action<ICardView> DropCardCallback { get; set; }
         Action EndMakeMoveCallback { get; set; }
         void SetCardViews(ICollection<ICardView> cardViews);
+        void SetName(string name);
     }
 }

@@ -14,9 +14,12 @@ namespace Assets.Models
         private Dictionary<string, bool> cardsInfoIsAttacking;
         private Dictionary<string, bool> cardsInfoIsMassTarget;
 
-        public PlayerEnemy(string name) : base(name) { }
+        public PlayerEnemy(string name) : base(name) 
+        {
+            Name = GenerateRandomName();
+        }
 
-        public PlayerEnemy(string name, string pathFileCardsInfo) : base(name)
+        public PlayerEnemy(string name, string pathFileCardsInfo) : this(name)
         {
             cardsInfoIsMassTarget = new Dictionary<string, bool>();
             cardsInfoIsAttacking = new Dictionary<string, bool>();
@@ -32,6 +35,15 @@ namespace Assets.Models
                 cardsInfoIsMassTarget.Add(nameCard, isMassTarget);
                 cardsInfoIsAttacking.Add(nameCard, isAttacking);
             }
+        }
+
+        private string GenerateRandomName() 
+        {
+            Random r = new Random();
+            string[] names = { "Вселяющий ужас", "Дядя Боб", "Бест игрок", "Nagibator2000" };
+            int index = r.Next(names.Length);
+
+            return names[index];
         }
 
         private Card SelectCardToMove(IReadOnlyDictionary<Player, List<Card>> openCards, out Card targetCard) 

@@ -6,14 +6,16 @@ using Assets.Views;
 using UnityEngine.EventSystems;
 using System;
 using DG.Tweening;
+using TMPro;
 
 public class PlayerView : MonoBehaviour, IPlayerView
 {
     public GameObject Hand;
-    
-    public Action<ICardView> DropCardCallback { get; set; } // —сылка на метод презентера, в котором вызываетс€ метод выполнени€ хода в модели
-    public Action<ICardView> PlayCurrentCardCallback { get; set; } // —сылка на метод презентера, в котором вызываетс€ метод взаимодействи€ с выбранной картой в модели
-    public Action EndMakeMoveCallback { get; set; } // —сылка на метод презентера, в котором вызываетс€ метод заврешени€ хода в модели
+    public TextMeshProUGUI PlayerName;
+
+    public Action<ICardView> DropCardCallback { get; set; }
+    public Action<ICardView> PlayCurrentCardCallback { get; set; }
+    public Action EndMakeMoveCallback { get; set; }
 
     private Vector3 CalculateMovingPosition(Transform transform) 
     {
@@ -29,6 +31,11 @@ public class PlayerView : MonoBehaviour, IPlayerView
             movingPosition.x += offset;
         }
         return movingPosition;
+    }
+
+    public void SetName(string name) 
+    {
+        PlayerName.text = name;
     }
 
     public virtual void SetCardViews(ICollection<ICardView> cardViews) 

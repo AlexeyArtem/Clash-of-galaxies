@@ -1,12 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 // Наследовать от MenuScr
 public class PauseMenuScr : MonoBehaviour
 {
     private bool isPause = false;
-    public GameObject PausePanel;
+    public GameObject PausePanel, BackPanelBG, GameRulesPanel;
 
     // Update is called once per frame
     void Update()
@@ -30,14 +31,23 @@ public class PauseMenuScr : MonoBehaviour
         PausePanel.SetActive(false);
     }
 
+    public void ExitToPauseMenu() 
+    {
+        BackPanelBG.SetActive(false);
+        GameRulesPanel.SetActive(false);
+        Time.timeScale = 1.0f;
+    }
+
     public void ShowGameRules() 
     {
-
+        BackPanelBG.SetActive(true);
+        GameRulesPanel.SetActive(true);
     }
 
     public void ExitMainMenu() 
     {
-
+        Time.timeScale = 1.0f;
+        SceneManager.LoadScene("MenuScene");
     }
 
     public void ExitGame() 

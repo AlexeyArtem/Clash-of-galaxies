@@ -24,6 +24,7 @@ namespace Assets.Presenters
 
             List<ICardView> cardViews = GetCardViews(player.CardsInHand);
             playerView.SetCardViews(cardViews);
+            playerView.SetName(player.Name);
 
             playerView.DropCardCallback = DropCardView;
             playerView.PlayCurrentCardCallback = PlayCurrentCardView;

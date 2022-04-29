@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 
 public class MainMenuScr : MonoBehaviour
 {
-    public GameObject BackMenuPanel, GameRulesPanel, SettingsPanel;
+    public GameObject BackMenuBG, GameRulesPanel, SettingsPanel;
 
     // Start is called before the first frame update
     void Start()
@@ -31,13 +31,13 @@ public class MainMenuScr : MonoBehaviour
 
     public void SettingsClick() 
     {
-        BackMenuPanel.SetActive(true);
+        BackMenuBG.SetActive(true);
         SettingsPanel.SetActive(true);
     }
 
     public void RulesClick() 
     {
-        BackMenuPanel.SetActive(true);
+        BackMenuBG.SetActive(true);
         GameRulesPanel.SetActive(true);
     }
 
@@ -45,6 +45,6 @@ public class MainMenuScr : MonoBehaviour
     {
         GameRulesPanel.SetActive(false);
         SettingsPanel.SetActive(false);
-        BackMenuPanel.SetActive(false);
+        BackMenuBG.SetActive(false);
     }
 }

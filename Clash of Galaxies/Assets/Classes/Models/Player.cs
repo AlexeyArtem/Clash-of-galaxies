@@ -25,7 +25,7 @@ namespace Assets.Models
         public event MakeMoveEventHandler MakeMove;
         public event MakeMoveEventHandler PlayCurrentCard;
 
-        public string Name { get; }
+        public string Name { get; protected set; }
         public Card CurrentCard { get; protected set; }
         public bool IsMoveCompleted { get; protected set; } = false;
         public virtual bool IsPermissionMakeMove 

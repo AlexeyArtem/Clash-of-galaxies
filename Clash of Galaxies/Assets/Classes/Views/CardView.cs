@@ -15,8 +15,7 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
     private Vector2 offset;
     private static GameObject tempCardObj; // Временный шаблон карты, который отображает позицию для вставки карты
     private static Arrow greenArrowScr;
-    private Animator attackPointsAnimator, strengtheningPointsAnimator;
-    private Animator cardAnimator;
+    private Animator attackPointsAnimator, strengtheningPointsAnimator, cardAnimator;
 
     public Image CardImage;
     public TextMeshProUGUI Name, Description, GamePoints, InfluenceGamePoints, AttackPoints, StrengtheningPoints;
