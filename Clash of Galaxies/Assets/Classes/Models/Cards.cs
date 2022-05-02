@@ -30,7 +30,7 @@ namespace Assets.Models
                     new Card("Comet", 2, "Усиливает, выбранную карту на 2 ед. Если выбрана карта Star, то усиливает её на 4 ед.",
                               "cometTemp", new CometBehaviour(player, openCards)),
                     new Card("Planet", 5, "Статичная карта Planet.", "planetTemp"),
-                    new Card("Star", 10, "Статичная карта Start.", "starTemp"),
+                    new Card("Star", 10, "Статичная карта Star.", "starTemp"),
 
                 };
                 Count = cards.Count;

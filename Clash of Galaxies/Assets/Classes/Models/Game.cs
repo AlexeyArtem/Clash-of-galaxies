@@ -26,6 +26,7 @@ namespace Assets.Models
 
             this.playerA = playerA;
             this.playerB = playerB;
+            Settings = new Settings();
             GameBoard = new GameBoard(playerA, playerB);
             Cards = new Cards(GameBoard.OpenCards);
 
@@ -49,6 +50,12 @@ namespace Assets.Models
             DealCards += playerB.SetCardsInHand;
         }
 
+        public Game(Player playerA, Player playerB, Settings settings) : this(playerA, playerB) 
+        {
+            Settings = settings;
+        }
+
+        public Settings Settings { get; }
         public int CurrentRound { get; private set; } = 1;
         public Cards Cards { get; }
         public GameBoard GameBoard { get; }
@@ -127,7 +134,7 @@ namespace Assets.Models
 
             //ObservableStack<Card> deckCards = new ObservableStack<Card>();
             decks[player].Clear();
-            for (int i = 0; i < GameRules.MaxCardsInDeck; i++)
+            for (int i = 0; i < Settings.MaxCardsInDeck; i++)
             {
                 int index = rand.Next(0, Cards.Count);
                 Card card = Cards.Get(player, index);
@@ -154,7 +161,7 @@ namespace Assets.Models
         public void CheckStateMakeMove(int timeToMoveInSeconds)
         {
             RefreshPlayersResults();
-            if (timeToMoveInSeconds > GameRules.MaxTimeToMoveInSeconds || playerCurrentMove.IsMoveCompleted)
+            if (timeToMoveInSeconds > Settings.MaxTimeToMoveInSeconds || playerCurrentMove.IsMoveCompleted)
             {
                 Player winPlayerRound = null;
                 if (CheckEndRound(ref winPlayerRound)) 
@@ -212,7 +219,7 @@ namespace Assets.Models
 
         public bool CheckEndGame(ref Player winPlayer) 
         {
-            if (playersResults[playerA].RoundsWins != playersResults[playerB].RoundsWins && CurrentRound >= GameRules.MaxRounds) 
+            if (playersResults[playerA].RoundsWins != playersResults[playerB].RoundsWins && CurrentRound >= Settings.MaxRounds) 
             {
                 if (playersResults[playerA].RoundsWins > playersResults[playerB].RoundsWins)
                     winPlayer = playerA;
@@ -234,8 +241,8 @@ namespace Assets.Models
             GenerateDeck(playerA);
             GenerateDeck(playerB);
 
-            OnDealCards(playerA, GameRules.MaxStartPlayerCards);
-            OnDealCards(playerB, GameRules.MaxStartPlayerCards);
+            OnDealCards(playerA, Settings.MaxStartPlayerCards);
+            OnDealCards(playerB, Settings.MaxStartPlayerCards);
 
             int randNum = rand.Next(1, 3);
             Player player = randNum == 1 ? playerA : playerB;

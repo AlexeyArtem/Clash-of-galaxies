@@ -6,7 +6,7 @@ using Assets.Presenters;
 using Assets.Views;
 using System.Collections.ObjectModel;
 
-public class GameController : MonoBehaviour
+public class GameInitializer : MonoBehaviour
 {
     private Game game;
     private Player playerUser;
@@ -23,9 +23,11 @@ public class GameController : MonoBehaviour
 
     void Awake()
     {
-        playerUser = new Player("First player");
+        Settings settings = SaveSettingsScr.CurrentSettings == null ? new Settings() : SaveSettingsScr.CurrentSettings;
+
+        playerUser = new Player(settings.UserName);
         playerEnemy = new PlayerEnemy("Second player", "Assets/Resources/cards info.xml");
-        game = new Game(playerUser, playerEnemy);
+        game = new Game(playerUser, playerEnemy, settings);
 
         PlayerView playerView = FindObjectOfType<PlayerView>();
         playerUserPresenter = new PlayerPresenter(playerUser, playerView);
