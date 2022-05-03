@@ -193,7 +193,6 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
 
     public void DestroyView() 
     {
-        //AnimationCard.Play("destroyCard");
         cardAnimator.SetTrigger("OnMissing");
     }
 
@@ -212,10 +211,7 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
 
     public void DeactivateTargetArrow()
     {
-        if (transform.parent.name == "SelfField")
-        {
-            greenArrowScr.Deactivate();
-        }
+        greenArrowScr.Deactivate();
     }
 
     public void OnPointerEnter(PointerEventData eventData)

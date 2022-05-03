@@ -33,12 +33,14 @@ namespace Assets.Presenters
 
         private void Game_EndRound(object sender, EndEventArgs e)
         {
-            bool isPlayerUserWin = true;
+            RoundResult roundResult = RoundResult.WinUser;
 
             if (e.WinPlayer is PlayerEnemy)
-                isPlayerUserWin = false;
+                roundResult = RoundResult.WinEnemy;
+            if (e.WinPlayer == null)
+                roundResult = RoundResult.Draw;
 
-            pausePanelView.ShowResultRound(isPlayerUserWin, game.CurrentRound - 1);
+            pausePanelView.ShowResultRound(roundResult, game.CurrentRound - 1);
         }
     }
 }

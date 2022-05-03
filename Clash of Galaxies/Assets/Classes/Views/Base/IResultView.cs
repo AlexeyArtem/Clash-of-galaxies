@@ -8,7 +8,7 @@ namespace Assets.Views
 {
     interface IResultView
     {
-        void ShowResultRound(bool isPlayerUserWin, int winRoundNumber);
+        void ShowResultRound(RoundResult roundResult, int winRoundNumber);
         void ShowResultGame(bool isPlayerUserWin);
     }
 }

@@ -26,7 +26,7 @@ public class GameInitializer : MonoBehaviour
         Settings settings = SaveSettingsScr.CurrentSettings == null ? new Settings() : SaveSettingsScr.CurrentSettings;
 
         playerUser = new Player(settings.UserName);
-        playerEnemy = new PlayerEnemy("Second player", "Assets/Resources/cards info.xml");
+        playerEnemy = new PlayerEnemy("Assets/Resources/cards info.xml");
         game = new Game(playerUser, playerEnemy, settings);
 
         PlayerView playerView = FindObjectOfType<PlayerView>();

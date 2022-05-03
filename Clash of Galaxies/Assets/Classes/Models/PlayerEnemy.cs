@@ -14,12 +14,12 @@ namespace Assets.Models
         private Dictionary<string, bool> cardsInfoIsAttacking;
         private Dictionary<string, bool> cardsInfoIsMassTarget;
 
-        public PlayerEnemy(string name) : base(name) 
+        public PlayerEnemy() 
         {
             Name = GenerateRandomName();
         }
 
-        public PlayerEnemy(string name, string pathFileCardsInfo) : this(name)
+        public PlayerEnemy(string pathFileCardsInfo) : this()
         {
             cardsInfoIsMassTarget = new Dictionary<string, bool>();
             cardsInfoIsAttacking = new Dictionary<string, bool>();

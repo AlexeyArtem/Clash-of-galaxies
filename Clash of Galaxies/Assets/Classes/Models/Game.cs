@@ -64,7 +64,6 @@ namespace Assets.Models
 
         private event PermissionMakeMoveEventHandler PermissionMakeMove;
         private event DealCardsEventHandler DealCards;
-        public event DealCardsEventHandler NewCardsInDeck;
         public event EventHandler ChangedMakeMove;
         public event EndEventHandler EndRound;
         public event EndEventHandler EndGame;
@@ -85,11 +84,6 @@ namespace Assets.Models
             PermissionMakeMove?.Invoke(this, args);
         }
 
-        private void OnNewCardsInDeck(Player player, List<Card> cards) 
-        {
-            NewCardsInDeck?.Invoke(this, new DealCardsEventArgs(player, cards));
-        }
-
         private void OnDealCards(Player player, int countCards)
         {
             List<Card> cards = new List<Card>();
@@ -99,10 +93,7 @@ namespace Assets.Models
                 {
                     cards.Add(decks[player].Pop());
                 }
-                catch (InvalidOperationException)
-                {
-
-                }
+                catch (InvalidOperationException) { }
             }
             var args = new DealCardsEventArgs(player, cards);
             DealCards?.Invoke(this, args);
@@ -112,37 +103,31 @@ namespace Assets.Models
         {
             OnPermissionMakeMove(playerA, false);
             OnPermissionMakeMove(playerB, false);
-            // Вызов события окончания игры
+
             EndGame?.Invoke(this, new EndEventArgs(winPLayer));
 
             playerA.ClearCardsInHand();
             playerB.ClearCardsInHand();
             GameBoard.ClearOpenCards();
 
-            // Отписка от всех событий
             PermissionMakeMove = null;
             DealCards = null;
             ChangedMakeMove = null;
             EndRound = null;
             EndGame = null;
-            NewCardsInDeck = null;
         }
 
         private void GenerateDeck(Player player)
         {
             if (decks[player].Count > 0) return;
 
-            //ObservableStack<Card> deckCards = new ObservableStack<Card>();
             decks[player].Clear();
             for (int i = 0; i < Settings.MaxCardsInDeck; i++)
             {
                 int index = rand.Next(0, Cards.Count);
                 Card card = Cards.Get(player, index);
                 decks[player].Push(card);
-                //deckCards.Push(card);
             }
-            //decks[player] = deckCards;
-            //OnNewCardsInDeck(player, deckCards.ToList());
         }
 
         private void AllowMove(Player player)

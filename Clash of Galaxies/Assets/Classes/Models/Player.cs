@@ -15,11 +15,16 @@ namespace Assets.Models
         protected ObservableCollection<Card> cardsInHand;
         protected bool isPermissionMakeMove = false;
 
-        public Player(string name)
+        public Player() 
         {
-            Name = name;
             cardsInHand = new ObservableCollection<Card>();
             CardsInHand = new ReadOnlyObservableCollection<Card>(cardsInHand);
+            Name = "Default name";
+        }
+
+        public Player(string name) : this()
+        {
+            Name = name;
         }
 
         public event MakeMoveEventHandler MakeMove;

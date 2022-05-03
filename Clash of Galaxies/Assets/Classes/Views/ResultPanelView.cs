@@ -50,13 +50,21 @@ public class ResultPanelView : MonoBehaviour, IResultView
         Time.timeScale = 0;
     }
 
-    public void ShowResultRound(bool isPlayerUserWin, int roundNumber)
+    public void ShowResultRound(RoundResult roundResult, int roundNumber)
     {
-        string text;
-        if (isPlayerUserWin)
-            text = "Поздравляем! Вы победили в " + roundNumber + " раунде!";
-        else
-            text = "К сожалению, Вы проиграли в " + roundNumber + " раунде!"; ;
+        string text = "";
+        switch (roundResult) 
+        {
+            case RoundResult.WinUser:
+                text = "Поздравляем! Вы победили в " + roundNumber + " раунде!";
+                break;
+            case RoundResult.WinEnemy:
+                text = "К сожалению, Вы проиграли в " + roundNumber + " раунде!"; ;
+                break;
+            case RoundResult.Draw:
+                text = "Ничья в " + roundNumber + " раунде!";
+                break;
+        }
 
         RoundResultText.text = text;
         gameObject.SetActive(true);
