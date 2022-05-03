@@ -22,7 +22,7 @@ namespace Assets.Presenters
             this.player = player;
             this.playerView = playerView;
 
-            List<ICardView> cardViews = GetCardViews(player.CardsInHand);
+            List<ICardView> cardViews = CreateCardViews(player.CardsInHand);
             playerView.SetCardViews(cardViews);
             playerView.SetName(player.Name);
 
@@ -39,12 +39,12 @@ namespace Assets.Presenters
             if (e.Action == NotifyCollectionChangedAction.Add) 
             {
                 var cards = e.NewItems.Cast<Card>();
-                List<ICardView> cardViews = GetCardViews(cards);
+                List<ICardView> cardViews = CreateCardViews(cards);
                 playerView.SetCardViews(cardViews);
             }
         }
 
-        private List<ICardView> GetCardViews(IEnumerable<Card> cards) 
+        private List<ICardView> CreateCardViews(IEnumerable<Card> cards) 
         {
             List<ICardView> cardViews = new List<ICardView>();
             foreach (var card in cards)

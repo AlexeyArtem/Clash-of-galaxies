@@ -30,19 +30,21 @@ namespace Assets.Presenters
             }
         }
 
-        private void Behaviour_EndBehaviour(object sender, EventArgs e)
-        {
-            cardView.DeactivateTargetArrow();
-        }
-
         private void Behaviour_BeginBehaviour(object sender, EventArgs e)
         {
-            cardView.ActivateTargetArrow();
+            if(sender == card)
+                cardView.ActivateBehaviour();
+        }
+
+        private void Behaviour_EndBehaviour(object sender, EventArgs e)
+        {
+            if(sender == card)
+                cardView.DeactivateBehaviour();
         }
 
         private void Card_Destroy(object sender, EventArgs e)
         {
-            cardView.DeactivateTargetArrow();
+            cardView.DeactivateBehaviour();
             cardView.DestroyView();
             card.PropertyChanged -= Card_PropertyChanged;
             card.Destroy -= Card_Destroy;

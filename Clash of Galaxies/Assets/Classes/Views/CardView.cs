@@ -16,6 +16,7 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
     private static GameObject tempCardObj; // Временный шаблон карты, который отображает позицию для вставки карты
     private static Arrow greenArrowScr;
     private Animator attackPointsAnimator, strengtheningPointsAnimator, cardAnimator;
+    private bool isActivateBehaviour;
 
     public Image CardImage;
     public TextMeshProUGUI Name, Description, GamePoints, InfluenceGamePoints, AttackPoints, StrengtheningPoints;
@@ -24,6 +25,19 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
 
     public Transform DefaultTempCardParent { get; set; }
     public Transform DefaultParent { get; set; }
+    public bool IsActivateBehaviour 
+    {
+        get 
+        {
+            return isActivateBehaviour;
+        }
+        private set 
+        {
+            isActivateBehaviour = value;
+            if (isActivateBehaviour) ActivateTargetArrow();
+            else DeactivateTargetArrow();
+        }
+    }
 
     void Awake() 
     {
@@ -51,7 +65,24 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
 
     void Update() 
     {
+        if (Input.GetKeyDown(KeyCode.Mouse1))
+        {
+            if (IsActivateBehaviour)
+                DeactivateTargetArrow();
+        }
+    }
 
+    private void ActivateTargetArrow() 
+    {
+        if (transform.parent.name == "SelfField")
+        {
+            greenArrowScr.SetupAndActivate(transform);
+        }
+    }
+
+    private void DeactivateTargetArrow() 
+    {
+        greenArrowScr.Deactivate();
     }
 
     // Проверка позиции текущей карты относительно других и перемещение карты в зависимости от позиции карт, находящихся рядом
@@ -166,6 +197,8 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        if(IsActivateBehaviour) ActivateTargetArrow();
+
         if (transform.parent.name == "SelfField" || transform.parent.name == "EnemyField") 
         {
             PlayerView playerView = FindObjectOfType<PlayerView>();
@@ -201,17 +234,14 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
         Destroy(gameObject);
     }
 
-    public void ActivateTargetArrow()
+    public void ActivateBehaviour()
     {
-        if (transform.parent.name == "SelfField")
-        {
-            greenArrowScr.SetupAndActivate(transform);
-        }
+        IsActivateBehaviour = true;
     }
 
-    public void DeactivateTargetArrow()
+    public void DeactivateBehaviour()
     {
-        greenArrowScr.Deactivate();
+        IsActivateBehaviour = false;
     }
 
     public void OnPointerEnter(PointerEventData eventData)

@@ -8,8 +8,6 @@ namespace Assets.Models
 {
     public abstract class TargetBehaviour : Behaviour
     {
-        protected Card currentCard;
-
         protected TargetBehaviour(Player owner, IReadOnlyDictionary<Player, List<Card>> openCards) : base(owner, openCards)
         {
             owner.PlayCurrentCard += ProcessPlayedCard;

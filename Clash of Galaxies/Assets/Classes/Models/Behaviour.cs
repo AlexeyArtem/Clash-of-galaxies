@@ -9,6 +9,8 @@ namespace Assets.Models
     public abstract class Behaviour
     {
         private bool isActivate;
+
+        protected Card currentCard;
         protected Player owner;
         protected IReadOnlyDictionary<Player, List<Card>> openCards;
 
@@ -38,12 +40,12 @@ namespace Assets.Models
 
         private void OnBeginBehaviour()
         {
-            BeginBehaviour?.Invoke(this, new EventArgs());
+            BeginBehaviour?.Invoke(currentCard, new EventArgs());
         }
 
         private void OnEndBehaviour()
         {
-            EndBehaviour?.Invoke(this, new EventArgs());
+            EndBehaviour?.Invoke(currentCard, new EventArgs());
         }
 
         public abstract void Activate(Card card);

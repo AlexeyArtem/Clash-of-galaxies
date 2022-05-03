@@ -13,7 +13,7 @@ namespace Assets.Views
         void SetActiveCardShirt(bool isActive);
         void ChangeGamePoints(int gamePoints);
         void DestroyView();
-        void ActivateTargetArrow();
-        void DeactivateTargetArrow();
+        void ActivateBehaviour();
+        void DeactivateBehaviour();
     }
 }
