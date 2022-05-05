@@ -20,20 +20,21 @@ namespace Assets.Presenters
             this.timerView.CheckStateMakeMoveCallback = CheckStateMakeMove;
             this.game.ChangedMakeMove += Game_ChangeMakeMove;
             this.game.EndRound += Game_StoppedRound;
-
-            //timerView.StopTimer();
-            //timerView.StartTimer();
         }
 
         private void Game_StoppedRound(object sender, EventArgs e)
         {
-            //timerView.StopTimer();
+            timerView.StopTimer();
         }
 
         private void Game_ChangeMakeMove(object sender, EventArgs e)
         {
+            bool isPlayerUserMove = true;
+            if (game.PlayerCurrentMove is PlayerEnemy)
+                isPlayerUserMove = false;
+
             timerView.StopTimer();
-            timerView.StartTimer();
+            timerView.StartTimer(isPlayerUserMove);
         }
 
         public void CheckStateMakeMove(int timeToMoveInSeconds) 

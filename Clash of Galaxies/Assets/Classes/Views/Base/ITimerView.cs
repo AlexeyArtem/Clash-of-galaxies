@@ -10,6 +10,7 @@ namespace Assets.Views
     {
         Action<int> CheckStateMakeMoveCallback { get; set; }
         void StartTimer();
+        void StartTimer(bool isPlayerUserMove);
         void StopTimer();
     }
 }

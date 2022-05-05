@@ -8,24 +8,16 @@ using Assets.Views;
 public class TimerView : MonoBehaviour, ITimerView
 {
     private int timeToMove;
+    private System.Random random = new System.Random();
 
+    public TextMeshProUGUI CurrentMoveText;
     public TextMeshProUGUI TimerText;
+
     public Action<int> CheckStateMakeMoveCallback { get; set; }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     public IEnumerator CheckStateMakeMove() 
     {
+        int enemyTime = random.Next(2, 11);
         while (true) 
         {
             timeToMove++;
@@ -44,5 +36,15 @@ public class TimerView : MonoBehaviour, ITimerView
     public void StopTimer()
     {
         StopAllCoroutines();
+    }
+
+    public void StartTimer(bool isPlayerUserMove)
+    {
+        if (isPlayerUserMove)
+            CurrentMoveText.text = "Ваш ход";
+        else
+            CurrentMoveText.text = "Ход противника";
+
+        StartTimer();
     }
 }

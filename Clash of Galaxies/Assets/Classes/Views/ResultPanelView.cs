@@ -26,7 +26,7 @@ public class ResultPanelView : MonoBehaviour, IResultView
             Time.timeScale = 1.0f;
             gameObject.SetActive(false);
             isEndRound = false;
-            time = 5;
+            time = 20;
         }
     }
 

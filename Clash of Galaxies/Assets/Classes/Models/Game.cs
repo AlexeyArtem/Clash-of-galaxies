@@ -13,6 +13,7 @@ namespace Assets.Models
     {
         private static Random rand = new Random();
 
+        private int enemyTime;
         private Player playerA, playerB;
         private Dictionary<Player, ObservableStack<Card>> decks;
         private Dictionary<Player, PlayerGameResult> playersResults;
@@ -59,6 +60,7 @@ namespace Assets.Models
         public int CurrentRound { get; private set; } = 1;
         public Cards Cards { get; }
         public GameBoard GameBoard { get; }
+        public Player PlayerCurrentMove { get => playerCurrentMove; }
         public IReadOnlyDictionary<Player, ObservableStack<Card>> Decks { get; }
         public IReadOnlyDictionary<Player, PlayerGameResult> PlayersResults { get; }
 
@@ -146,6 +148,14 @@ namespace Assets.Models
         public void CheckStateMakeMove(int timeToMoveInSeconds)
         {
             RefreshPlayersResults();
+
+            if (playerCurrentMove is PlayerEnemy && enemyTime > 0)
+            {
+                enemyTime--;
+                return;
+            }
+            (playerCurrentMove as PlayerEnemy)?.Play();
+
             if (timeToMoveInSeconds > Settings.MaxTimeToMoveInSeconds || playerCurrentMove.IsMoveCompleted)
             {
                 Player winPlayerRound = null;
@@ -175,6 +185,7 @@ namespace Assets.Models
                     OnDealCards(playerB, 1);
                 }
             }
+            enemyTime = rand.Next(3, 9);
         }
 
         public bool CheckEndRound(ref Player winPlayer)

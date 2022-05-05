@@ -17,6 +17,7 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
     private static Arrow greenArrowScr;
     private Animator attackPointsAnimator, strengtheningPointsAnimator, cardAnimator;
     private bool isActivateBehaviour;
+    private bool isDraggable;
 
     public Image CardImage;
     public TextMeshProUGUI Name, Description, GamePoints, InfluenceGamePoints, AttackPoints, StrengtheningPoints;
@@ -138,8 +139,9 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        if (transform.parent.name == "EnemyHand" || transform.parent.name == "EnemyField") return; // Нельзя перетаскивать карту, которая находится у противника
+        if (transform.parent.name != "SelfHand") return; // Нельзя перетаскивать карту, которая находится у противника
 
+        isDraggable = true;
         TooltipObj.SetActive(false);
         tempCardObj.SetActive(true);
 
@@ -158,7 +160,9 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
 
     public void OnDrag(PointerEventData eventData)
     {
-        if (transform.parent.name == "EnemyHand" || transform.parent.name == "EnemyField") return;
+        if (!isDraggable) return;
+        //if (transform.parent.name == "EnemyHand" || transform.parent.name == "EnemyField") return;
+        //if (transform.parent.name != "SelfHand") return;
 
         // Получение текущих координат экрана и преобразование к глобальным коодинатам
         Vector2 newPos = mainCamera.ScreenToWorldPoint(eventData.position);
@@ -172,7 +176,9 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        if (transform.parent.name == "EnemyHand" || transform.parent.name == "EnemyField") return;
+        if (!isDraggable) return;
+        //if (transform.parent.name == "EnemyHand" || transform.parent.name == "EnemyField" || transform.parent.name == "DeckUser" || transform.parent.name == "DeckEnemy") return;
+        //if (transform.parent.name != "SelfHand" || transform.parent.name != "SelfField") return;
 
         if (DefaultParent != null) 
         {
@@ -188,6 +194,7 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
 
         // Убрать временную карту с игрового поля, когда перетаскивание завершено
         tempCardObj.SetActive(false);
+        isDraggable = false;
     }
 
     public void SetActiveCardShirt(bool isActive)

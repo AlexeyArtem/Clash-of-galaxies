@@ -11,6 +11,9 @@ namespace Assets.Models
 {
     public class PlayerEnemy : Player
     {
+        private Card cardToMove;
+        private Card targetCard;
+
         private Dictionary<string, bool> cardsInfoIsAttacking;
         private Dictionary<string, bool> cardsInfoIsMassTarget;
 
@@ -89,13 +92,16 @@ namespace Assets.Models
             {
                 IsPermissionMakeMove = args.IsPermissionMakeMove;
                 if (IsPermissionMakeMove) 
-                {
-                    Card card = SelectCardToMove(args.OpenCards, out Card targetCard);
-                    OnMakeMove(card);
-                    if (targetCard != null) OnPlayCurrentCard(targetCard);
-                    CompleteMove();
-                }
+                    cardToMove = SelectCardToMove(args.OpenCards, out targetCard);
             }
+        }
+
+        public void Play() 
+        {
+            OnMakeMove(cardToMove);
+            if (targetCard != null)
+                OnPlayCurrentCard(targetCard);
+            CompleteMove();
         }
     }
 }

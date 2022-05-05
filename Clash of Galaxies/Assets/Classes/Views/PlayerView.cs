@@ -10,6 +10,8 @@ using TMPro;
 
 public class PlayerView : MonoBehaviour, IPlayerView
 {
+    private Sequence sequence;
+
     public GameObject Hand;
     public TextMeshProUGUI PlayerName;
 
@@ -17,7 +19,7 @@ public class PlayerView : MonoBehaviour, IPlayerView
     public Action<ICardView> PlayCurrentCardCallback { get; set; }
     public Action EndMakeMoveCallback { get; set; }
 
-    private Vector3 CalculateMovingPosition(Transform transform) 
+    private Vector3 CalculateMovingPosition() 
     {
         Vector3 movingPosition = transform.position;
         var childCount = Hand.transform.childCount;
@@ -42,35 +44,27 @@ public class PlayerView : MonoBehaviour, IPlayerView
     {
         if (cardViews.Count == 0) return;
 
-        Sequence movingAnimation = DOTween.Sequence();
-        Transform transformMovingField = Hand.transform;
-        Vector3 movingPosition = CalculateMovingPosition(transformMovingField);
-        float offset = 0;
+        //if (sequence == null || !sequence.IsActive())
+        //    sequence = DOTween.Sequence();
+
         foreach (var cardView in cardViews)
         {
-            //ѕопробовать сделать через корутины
-
-            cardView.SetActiveCardShirt(false);
             MonoBehaviour objectCardView = cardView as MonoBehaviour;
-            //CardView objectCardView = cardView as CardView;
             objectCardView.gameObject.SetActive(true);
 
-            //objectCardView.MoveToFieldAnimate(transformMovingField, movingPosition);
-
-            //movingAnimation.Append(objectCardView.transform.DOMove(movingPosition, .7f)).OnComplete(() =>
-            //{
-            //    objectCardView.transform.SetParent(transformMovingField);
-            //});
-
+            Vector3 movingPosition = CalculateMovingPosition();
             objectCardView.transform.DOMove(movingPosition, .7f).OnComplete(() =>
             {
-                objectCardView.transform.SetParent(transformMovingField);
+                objectCardView.transform.SetParent(Hand.transform);
             });
 
-            offset += 1.2f;
-            movingPosition.x += offset;
+            //sequence.Append(objectCardView.transform.DOMove(movingPosition, .7f).OnComplete(() =>
+            //{
+            //    objectCardView.transform.SetParent(Hand.transform);
+            //}));
+
+            cardView.SetActiveCardShirt(false);
         }
-        //movingAnimation.Play();
     }
 
     public void CompleteMoveClick() 
