@@ -8,7 +8,7 @@ using Assets.Views;
 
 namespace Assets.Presenters
 {
-    class GameBoardPresenter
+    class GameBoardPresenter : IUnsubscribing
     {
         private GameBoard gameBoard;
         private IGameBoardView gameBoardView;
@@ -31,6 +31,11 @@ namespace Assets.Presenters
                 else if (args.Player == gameBoard.PlayerB)
                     gameBoardView.SetCardViewPlayerB(cardPresenter.CardView);
             }
+        }
+
+        public void Unsubscribe()
+        {
+            gameBoard.NewOpenCard -= GameBoard_NewOpenCard;
         }
     }
 }

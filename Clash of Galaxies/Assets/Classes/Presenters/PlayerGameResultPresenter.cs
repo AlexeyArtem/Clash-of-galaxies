@@ -9,7 +9,7 @@ using Assets.Views;
 
 namespace Assets.Presenters
 {
-    class PlayerGameResultPresenter
+    class PlayerGameResultPresenter : IUnsubscribing
     {
         private PlayerGameResult playerGameResult;
         private IPlayerGameResultView playerGameResultView;
@@ -20,6 +20,7 @@ namespace Assets.Presenters
             this.playerGameResultView = playerGameResultView;
             playerGameResultView.SetRoundsWins(playerGameResult.RoundsWins);
             playerGameResultView.SetTotalGamePoints(playerGameResult.TotalGamePoints);
+
             playerGameResult.PropertyChanged += PlayerGameResult_PropertyChanged;
         }
 
@@ -27,12 +28,11 @@ namespace Assets.Presenters
         {
             playerGameResultView.SetRoundsWins(playerGameResult.RoundsWins);
             playerGameResultView.SetTotalGamePoints(playerGameResult.TotalGamePoints);
-            
-            if (e.PropertyName == "RoundsWins") 
-            {
-                // Остановить игру
-                // Вывести экран с информацией о результате раунда
-            }
+        }
+
+        public void Unsubscribe()
+        {
+            playerGameResult.PropertyChanged -= PlayerGameResult_PropertyChanged;
         }
     }
 }

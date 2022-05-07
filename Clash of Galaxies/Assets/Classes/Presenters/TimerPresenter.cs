@@ -8,7 +8,7 @@ using Assets.Views;
 
 namespace Assets.Presenters
 {
-    class TimerPresenter
+    class TimerPresenter : IUnsubscribing
     {
         private Game game;
         private ITimerView timerView;
@@ -42,5 +42,11 @@ namespace Assets.Presenters
             game.CheckStateMakeMove(timeToMoveInSeconds);
         }
 
+        public void Unsubscribe()
+        {
+            timerView.CheckStateMakeMoveCallback = null;
+            game.ChangedMakeMove -= Game_ChangeMakeMove;
+            game.EndRound -= Game_StoppedRound;
+        }
     }
 }

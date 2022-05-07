@@ -101,24 +101,6 @@ namespace Assets.Models
             DealCards?.Invoke(this, args);
         }
 
-        public void OnEndGame(Player winPLayer)
-        {
-            OnPermissionMakeMove(playerA, false);
-            OnPermissionMakeMove(playerB, false);
-
-            EndGame?.Invoke(this, new EndEventArgs(winPLayer));
-
-            playerA.ClearCardsInHand();
-            playerB.ClearCardsInHand();
-            GameBoard.ClearOpenCards();
-
-            PermissionMakeMove = null;
-            DealCards = null;
-            ChangedMakeMove = null;
-            EndRound = null;
-            EndGame = null;
-        }
-
         private void GenerateDeck(Player player)
         {
             if (decks[player].Count > 0) return;
@@ -137,6 +119,27 @@ namespace Assets.Models
             OnPermissionMakeMove(player, true);
             playerCurrentMove = player;
             OnChangeMakeMove();
+        }
+
+        public void OnEndGame(Player winPLayer)
+        {
+            OnPermissionMakeMove(playerA, false);
+            OnPermissionMakeMove(playerB, false);
+            EndGame?.Invoke(this, new EndEventArgs(winPLayer));
+
+            var players = new List<Player>() { playerA, playerB };
+            foreach (var player in players)
+            {
+                player.ClearCardsInHand();
+                player.Unsubscribe();
+            }
+            GameBoard.ClearOpenCards();
+
+            PermissionMakeMove = null;
+            DealCards = null;
+            ChangedMakeMove = null;
+            EndRound = null;
+            EndGame = null;
         }
 
         public void RefreshPlayersResults()

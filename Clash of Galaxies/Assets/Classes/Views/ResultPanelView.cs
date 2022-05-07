@@ -40,9 +40,9 @@ public class ResultPanelView : MonoBehaviour, IResultView
             text = "К сожалению, Вы проиграли!";
 
         GameResultText.text = text;
-        EndRoundWindow.SetActive(false);
-        gameObject.SetActive(true);
-        EndGameWindow.SetActive(true);
+        EndRoundWindow?.SetActive(false);
+        gameObject?.SetActive(true);
+        EndGameWindow?.SetActive(true);
 
         Animator animator = EndGameWindow.GetComponent<Animator>();
         animator.Play("ScaledDisplaying");

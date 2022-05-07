@@ -9,7 +9,7 @@ using Assets.Views;
 
 namespace Assets.Presenters
 {
-    class DeckCardsPresenter
+    class DeckCardsPresenter : IUnsubscribing
     {
         private IEnumerable<Card> cards;
         private IDeckCardsView deckCardsView;
@@ -27,7 +27,7 @@ namespace Assets.Presenters
 
         private void CollectionCards_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (e.Action == NotifyCollectionChangedAction.Add) 
+            if (e.Action == NotifyCollectionChangedAction.Add)
             {
                 var cards = e.NewItems.Cast<Card>();
                 SetDeckCardsView(cards);
@@ -40,10 +40,16 @@ namespace Assets.Presenters
             foreach (var card in cards)
             {
                 ICardView cardView = CardViewFactory.GetInstance().GetNewView();
-                CardPresenterFactory.GetInstance().CreateNewPresenter(card, cardView);
+                CardPresenterFactory.GetInstance().GetOrCreatePresenter(card, cardView);
                 cardViews.Add(cardView);
             }
             deckCardsView.SetDeckCards(cardViews);
+        }
+
+        public void Unsubscribe()
+        {
+            var collectionCards = (INotifyCollectionChanged)cards;
+            collectionCards.CollectionChanged -= CollectionCards_CollectionChanged;
         }
     }
 }

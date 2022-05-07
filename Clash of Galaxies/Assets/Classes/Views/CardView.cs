@@ -77,13 +77,13 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
     {
         if (transform.parent.name == "SelfField")
         {
-            greenArrowScr.SetupAndActivate(transform);
+            greenArrowScr?.SetupAndActivate(transform);
         }
     }
 
     private void DeactivateTargetArrow() 
     {
-        greenArrowScr.Deactivate();
+        greenArrowScr?.Deactivate();
     }
 
     // Проверка позиции текущей карты относительно других и перемещение карты в зависимости от позиции карт, находящихся рядом
@@ -109,12 +109,21 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
     {
         Sequence sequence = DOTween.Sequence();
 
-        sequence.Append(transform.DOMove(position, time))
+        transform.DOMove(position, time)
         .OnComplete(() => {
             transform.SetParent(parent);
         });
+    }
 
-        sequence.Play();
+    public void MoveToFieldAnimate(Transform parent, Vector2 position, int siblingIndex, float time = .8f)
+    {
+        Sequence sequence = DOTween.Sequence();
+
+        transform.DOMove(position, time)
+        .OnComplete(() => {
+            transform.SetParent(parent);
+            transform.SetSiblingIndex(siblingIndex);
+        });
     }
 
     public void SetCardInfo(string name, string description, int gamePoints, int influenceGamePoints)
@@ -161,8 +170,7 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
     public void OnDrag(PointerEventData eventData)
     {
         if (!isDraggable) return;
-        //if (transform.parent.name == "EnemyHand" || transform.parent.name == "EnemyField") return;
-        //if (transform.parent.name != "SelfHand") return;
+
 
         // Получение текущих координат экрана и преобразование к глобальным коодинатам
         Vector2 newPos = mainCamera.ScreenToWorldPoint(eventData.position);
@@ -177,16 +185,18 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
     public void OnEndDrag(PointerEventData eventData)
     {
         if (!isDraggable) return;
-        //if (transform.parent.name == "EnemyHand" || transform.parent.name == "EnemyField" || transform.parent.name == "DeckUser" || transform.parent.name == "DeckEnemy") return;
-        //if (transform.parent.name != "SelfHand" || transform.parent.name != "SelfField") return;
 
         if (DefaultParent != null) 
         {
             int index = tempCardObj.transform.GetSiblingIndex();
-            Vector2 position = DefaultParent.GetChild(index).position;
-            MoveToFieldAnimate(DefaultParent, position, .4f);
-        }
+            Vector2 position = DefaultParent.GetChild(DefaultParent.childCount - 1).position;
+            if (index < DefaultParent.childCount)
+                position = DefaultParent.GetChild(index).position;
 
+            if (tempCardObj.transform.parent.name == "SelfHand")
+                transform.SetParent(DefaultParent);
+            MoveToFieldAnimate(DefaultParent, position, index, .4f);
+        }
         GetComponent<CanvasGroup>().blocksRaycasts = true;
 
         // Установка индекса временной карты текущей карте

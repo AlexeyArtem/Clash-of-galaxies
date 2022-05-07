@@ -12,7 +12,7 @@ using System.Collections.Specialized;
 
 namespace Assets.Presenters
 {
-    class PlayerPresenter
+    class PlayerPresenter : IUnsubscribing
     {
         private Player player;
         private IPlayerView playerView;
@@ -56,7 +56,7 @@ namespace Assets.Presenters
                 else 
                 {
                     var view = CardViewFactory.GetInstance().GetNewView();
-                    CardPresenterFactory.GetInstance().CreateNewPresenter(card, view);
+                    CardPresenterFactory.GetInstance().GetOrCreatePresenter(card, view);
                     cardViews.Add(view);
                 }
                     
@@ -87,6 +87,16 @@ namespace Assets.Presenters
                 Card card = cardPresenter.Card;
                 player.OnPlayCurrentCard(card);
             }
+        }
+
+        public void Unsubscribe()
+        {
+            playerView.DropCardCallback = null;
+            playerView.PlayCurrentCardCallback = null;
+            playerView.EndMakeMoveCallback = null;
+
+            var collectionCards = (INotifyCollectionChanged)player.CardsInHand;
+            collectionCards.CollectionChanged -= CollectionCards_CollectionChanged;
         }
     }
 }

@@ -9,7 +9,7 @@ using Assets.Views;
 
 namespace Assets.Presenters
 {
-    class CardPresenter
+    class CardPresenter : IUnsubscribing
     {
         private Card card;
         private ICardView cardView;
@@ -30,6 +30,9 @@ namespace Assets.Presenters
             }
         }
 
+        public ICardView CardView { get => cardView; }
+        public Card Card { get => card; }
+
         private void Behaviour_BeginBehaviour(object sender, EventArgs e)
         {
             if(sender == card)
@@ -46,13 +49,7 @@ namespace Assets.Presenters
         {
             cardView.DeactivateBehaviour();
             cardView.DestroyView();
-            card.PropertyChanged -= Card_PropertyChanged;
-            card.Destroy -= Card_Destroy;
-            if (card.Behaviour != null)
-            {
-                card.Behaviour.BeginBehaviour -= Behaviour_BeginBehaviour;
-                card.Behaviour.EndBehaviour -= Behaviour_EndBehaviour;
-            }
+            Unsubscribe();
             card = null;
             cardView = null;
         }
@@ -65,19 +62,14 @@ namespace Assets.Presenters
             }
         }
 
-        public ICardView CardView 
+        public void Unsubscribe()
         {
-            get 
+            card.PropertyChanged -= Card_PropertyChanged;
+            card.Destroy -= Card_Destroy;
+            if (card.Behaviour != null)
             {
-                return cardView;
-            }
-        }
-
-        public Card Card 
-        {
-            get 
-            {
-                return card;
+                card.Behaviour.BeginBehaviour -= Behaviour_BeginBehaviour;
+                card.Behaviour.EndBehaviour -= Behaviour_EndBehaviour;
             }
         }
     }

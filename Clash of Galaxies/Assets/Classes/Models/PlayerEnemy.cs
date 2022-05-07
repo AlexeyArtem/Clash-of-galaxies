@@ -91,9 +91,16 @@ namespace Assets.Models
             if (args.Player == this)
             {
                 IsPermissionMakeMove = args.IsPermissionMakeMove;
-                if (IsPermissionMakeMove) 
+                if (IsPermissionMakeMove)
                     cardToMove = SelectCardToMove(args.OpenCards, out targetCard);
             }
+        }
+
+        public override void ClearCardsInHand()
+        {
+            base.ClearCardsInHand();
+            cardToMove = null;
+            targetCard = null;
         }
 
         public void Play() 

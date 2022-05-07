@@ -8,7 +8,7 @@ using Assets.Views;
 
 namespace Assets.Presenters
 {
-    class ResultPresenter
+    class ResultPresenter : IUnsubscribing
     {
         private Game game;
         private IResultView pausePanelView;
@@ -41,6 +41,12 @@ namespace Assets.Presenters
                 roundResult = RoundResult.Draw;
 
             pausePanelView.ShowResultRound(roundResult, game.CurrentRound - 1);
+        }
+
+        public void Unsubscribe()
+        {
+            game.EndRound -= Game_EndRound;
+            game.EndGame -= Game_EndGame;
         }
     }
 }

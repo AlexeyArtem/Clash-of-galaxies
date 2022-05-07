@@ -17,7 +17,10 @@ namespace Assets.Presenters
         private CardPresenterFactory() 
         {
             presenters = new List<CardPresenter>();
+            Values = new ReadOnlyCollection<CardPresenter>(presenters);
         }
+
+        public ReadOnlyCollection<CardPresenter> Values { get; }
 
         private void Card_Destroy(object sender, EventArgs e)
         {
@@ -27,8 +30,6 @@ namespace Assets.Presenters
             card.Destroy -= Card_Destroy;
         }
 
-        public ReadOnlyCollection<CardPresenter> Presenters { get; }
-
         public static CardPresenterFactory GetInstance() 
         {
             if (instance == null)
@@ -37,16 +38,27 @@ namespace Assets.Presenters
             return instance;
         }
 
-        public CardPresenter CreateNewPresenter(Card card, ICardView cardView) 
+        public CardPresenter GetOrCreatePresenter(Card card, ICardView cardView) 
         {
-            if (FindPresenter(card) != null || FindPresenter(cardView) != null)
-                return null;
+            CardPresenter presenter = FindPresenter(card);
+            if (presenter == null) 
+            {
+                presenter = new CardPresenter(card, cardView);
+                card.Destroy += Card_Destroy;
+                presenters.Add(presenter);
+            }
 
-            CardPresenter cardPresenter = new CardPresenter(card, cardView);
-            card.Destroy += Card_Destroy;
-            presenters.Add(cardPresenter);
+            return presenter;
+        }
 
-            return cardPresenter;
+        public void Clear() 
+        {
+            foreach (var presenter in presenters)
+            {
+                presenter.Card.Destroy -= Card_Destroy;
+                presenter.Unsubscribe();
+            }
+            presenters.Clear();
         }
 
         public CardPresenter FindPresenter(Card card)

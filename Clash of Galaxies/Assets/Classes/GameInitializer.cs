@@ -9,15 +9,7 @@ using System.Collections.ObjectModel;
 public class GameInitializer : MonoBehaviour
 {
     private Game game;
-    private Player playerUser;
-    private PlayerEnemy playerEnemy;
-
-    private PlayerPresenter playerUserPresenter, playerEnemyPresenter;
-    private GameBoardPresenter gameBoardPresenterUser, gameBoardPresenterEnemy;
-    private PlayerGameResultPresenter playerGameResultPresenterUser, playerGameResultPresenterEnemy;
-    private TimerPresenter timerPresenter;
-    private ResultPresenter resultPresenter;
-    private DeckCardsPresenter deckPresenterUser, deckPresenterEnemy;
+    private List<IUnsubscribing> unsubscribings;
 
     public GameObject TimerTextObj, ResultPanelObj, DeckUserObj, DeckEnemyObj;
 
@@ -25,28 +17,46 @@ public class GameInitializer : MonoBehaviour
     {
         Settings settings = SaveSettingsScr.CurrentSettings == null ? new Settings() : SaveSettingsScr.CurrentSettings;
 
-        playerUser = new Player(settings.UserName);
-        playerEnemy = new PlayerEnemy("Assets/Resources/cards info.xml");
+        Player playerUser = new Player(settings.UserName);
+        PlayerEnemy playerEnemy = new PlayerEnemy(Application.dataPath + "/StreamingAssets/cards info.xml");
         game = new Game(playerUser, playerEnemy, settings);
 
         PlayerView playerView = FindObjectOfType<PlayerView>();
-        playerUserPresenter = new PlayerPresenter(playerUser, playerView);
+        PlayerPresenter playerUserPresenter = new PlayerPresenter(playerUser, playerView);
 
         GameBoardView gameBoardView = FindObjectOfType<GameBoardView>();
         GameBoardPresenter gameBoardPresenter = new GameBoardPresenter(game.GameBoard, gameBoardView);
 
         PlayerEnemyView playerEnemyView = FindObjectOfType<PlayerEnemyView>();
-        playerEnemyPresenter = new PlayerPresenter(playerEnemy, playerEnemyView);
+        PlayerPresenter playerEnemyPresenter = new PlayerPresenter(playerEnemy, playerEnemyView);
 
-        playerGameResultPresenterUser = new PlayerGameResultPresenter(game.PlayersResults[playerUser], playerView.GetComponentInChildren<PlayerGameResultView>());
-        playerGameResultPresenterEnemy = new PlayerGameResultPresenter(game.PlayersResults[playerEnemy], playerEnemyView.GetComponentInChildren<PlayerGameResultView>());
+        PlayerGameResultPresenter playerGameResultPresenterUser = new PlayerGameResultPresenter(game.PlayersResults[playerUser], playerView.GetComponentInChildren<PlayerGameResultView>());
+        PlayerGameResultPresenter playerGameResultPresenterEnemy = new PlayerGameResultPresenter(game.PlayersResults[playerEnemy], playerEnemyView.GetComponentInChildren<PlayerGameResultView>());
 
-        timerPresenter = new TimerPresenter(game, TimerTextObj.GetComponent<TimerView>());
-        resultPresenter = new ResultPresenter(game, ResultPanelObj.GetComponent<ResultPanelView>());
+        TimerPresenter timerPresenter = new TimerPresenter(game, TimerTextObj.GetComponent<TimerView>());
+        ResultPresenter resultPresenter = new ResultPresenter(game, ResultPanelObj.GetComponent<ResultPanelView>());
 
-        deckPresenterUser = new DeckCardsPresenter(game.Decks[playerUser], DeckUserObj.GetComponent<DeckCardsView>());
-        deckPresenterEnemy = new DeckCardsPresenter(game.Decks[playerEnemy], DeckEnemyObj.GetComponent<DeckCardsView>());
+        DeckCardsPresenter deckPresenterUser = new DeckCardsPresenter(game.Decks[playerUser], DeckUserObj.GetComponent<DeckCardsView>());
+        DeckCardsPresenter deckPresenterEnemy = new DeckCardsPresenter(game.Decks[playerEnemy], DeckEnemyObj.GetComponent<DeckCardsView>());
+
+        unsubscribings = new List<IUnsubscribing>()
+        {
+            playerUserPresenter, playerEnemyPresenter, deckPresenterEnemy, deckPresenterUser,
+            gameBoardPresenter, resultPresenter, timerPresenter, 
+            playerGameResultPresenterUser, playerGameResultPresenterEnemy
+        };
 
         game.StartNewRound();
+        unsubscribings.AddRange(CardPresenterFactory.GetInstance().Values);
+    }
+
+    void OnDestroy()
+    {
+        CardPresenterFactory.GetInstance().Clear();
+        foreach (var obj in unsubscribings)
+            obj.Unsubscribe();
+        unsubscribings.Clear();
+
+        game.OnEndGame(null);
     }
 }

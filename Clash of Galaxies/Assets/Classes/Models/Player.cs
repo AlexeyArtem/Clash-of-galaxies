@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 
 namespace Assets.Models
 {
-    public class Player
+    public class Player : IUnsubscribing
     {
         protected ObservableCollection<Card> cardsInHand;
         protected bool isPermissionMakeMove = false;
@@ -100,12 +100,19 @@ namespace Assets.Models
             }
         }
 
-        public void ClearCardsInHand() 
+        public virtual void ClearCardsInHand() 
         {
             foreach (var card in cardsInHand)
                 card.OnDestroy();
 
             cardsInHand.Clear();
+            CurrentCard = null;
+        }
+
+        public void Unsubscribe() 
+        {
+            MakeMove = null;
+            PlayCurrentCard = null;
         }
     }
 }

@@ -15,7 +15,7 @@ public class SaveSettingsScr : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI resultSavingTxt, inputErrorTxt;
 
-    private static string savePath = "Assets/Resources/settings.dat";
+    private static string savePath = null;
     public static Settings CurrentSettings { get; private set; }
 
     void Awake()
@@ -64,6 +64,7 @@ public class SaveSettingsScr : MonoBehaviour
 
     public static void LoadSettings() 
     {
+        savePath ??= Application.persistentDataPath + "/settings.dat";
         if (File.Exists(savePath))
         {
             using (FileStream fs = new FileStream(savePath, FileMode.Open))
