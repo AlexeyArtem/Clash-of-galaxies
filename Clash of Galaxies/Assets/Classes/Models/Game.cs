@@ -24,7 +24,7 @@ namespace Assets.Models
         {
             if (playerA == playerB)
                 throw new ArgumentException("The players is match");
-
+            enemyTime = 5;
             this.playerA = playerA;
             this.playerB = playerB;
             Settings = new Settings();

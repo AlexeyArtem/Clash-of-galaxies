@@ -17,7 +17,6 @@ namespace Assets.Models
 
         protected override void ProcessPlayedCard(object sender, MakeMoveEventArgs args)
         {
-            //base.ProcessPlayedCard(sender, args);
             if (!CheckEventArgs(args)) return;
 
             var targetCards = openCards.Where(p => p.Key == owner).FirstOrDefault().Value;

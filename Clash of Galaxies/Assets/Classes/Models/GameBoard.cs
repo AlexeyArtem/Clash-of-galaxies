@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace Assets.Models
 {
-    // An area with open playing cards. Responsible for processing moves
     public class GameBoard
     {
         private Dictionary<Player, List<Card>> openCards;
