@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-// Наследовать от MenuScr
 public class PauseMenuScr : MonoBehaviour
 {
     private bool isPause = false;

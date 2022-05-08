@@ -10,6 +10,5 @@ namespace Assets.Views
     {
         void SetCardViewPlayerA(ICardView cardView);
         void SetCardViewPlayerB(ICardView cardView);
-        void SetCardView(ICardView cardView);
     }
 }

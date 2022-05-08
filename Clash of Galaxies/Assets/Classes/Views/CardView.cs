@@ -148,7 +148,7 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        if (transform.parent.name != "SelfHand") return; // Нельзя перетаскивать карту, которая находится у противника
+        if (transform.parent.name != "SelfHand") return;
 
         isDraggable = true;
         TooltipObj.SetActive(false);
@@ -156,13 +156,12 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
 
         offset = transform.position - mainCamera.ScreenToWorldPoint(eventData.position);
 
-        // Перемещение элемента вверх по иерархии игровых объектов
         DefaultParent = DefaultTempCardParent = transform.parent;
 
-        tempCardObj.transform.SetParent(DefaultParent, false); //В качестве родителя для временной карты выступает родитель текущей карта, т.е. Hand
+        tempCardObj.transform.SetParent(DefaultParent, false);
         tempCardObj.transform.SetSiblingIndex(transform.GetSiblingIndex());
 
-        transform.SetParent(DefaultParent.parent.parent); //Установка для карты родителя в качестве BG (background)
+        transform.SetParent(DefaultParent.parent.parent);
 
         GetComponent<CanvasGroup>().blocksRaycasts = false;
     }
@@ -199,10 +198,7 @@ public class CardView : MonoBehaviour, ICardView, IBeginDragHandler, IDragHandle
         }
         GetComponent<CanvasGroup>().blocksRaycasts = true;
 
-        // Установка индекса временной карты текущей карте
         transform.SetSiblingIndex(tempCardObj.transform.GetSiblingIndex());
-
-        // Убрать временную карту с игрового поля, когда перетаскивание завершено
         tempCardObj.SetActive(false);
         isDraggable = false;
     }

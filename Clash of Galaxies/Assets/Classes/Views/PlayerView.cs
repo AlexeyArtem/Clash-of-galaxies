@@ -44,9 +44,6 @@ public class PlayerView : MonoBehaviour, IPlayerView
     {
         if (cardViews.Count == 0) return;
 
-        //if (sequence == null || !sequence.IsActive())
-        //    sequence = DOTween.Sequence();
-
         foreach (var cardView in cardViews)
         {
             MonoBehaviour objectCardView = cardView as MonoBehaviour;
@@ -57,11 +54,6 @@ public class PlayerView : MonoBehaviour, IPlayerView
             {
                 objectCardView.transform.SetParent(Hand.transform);
             });
-
-            //sequence.Append(objectCardView.transform.DOMove(movingPosition, .7f).OnComplete(() =>
-            //{
-            //    objectCardView.transform.SetParent(Hand.transform);
-            //}));
 
             cardView.SetActiveCardShirt(false);
         }
